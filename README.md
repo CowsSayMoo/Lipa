@@ -1,4 +1,4 @@
-# Windows System Setup Script
+# Lipa Device Setup Script
 
 A PowerShell script to automate the initial setup and configuration of Windows devices.
 
@@ -20,81 +20,32 @@ A PowerShell script to automate the initial setup and configuration of Windows d
   - Installs all available Windows Updates
   - Runs HP Image Assistant for driver updates (HP devices)
 
+## Quick Start
+
+Run this command in PowerShell as Administrator:
+
+```powershell
+irm "https://raw.githubusercontent.com/CowsSayMoo/Lipa/main/Lipa_device_setup_script.ps1" | iex
+```
+
 ## Prerequisites
 
 - Windows 10 (version 1809+) or Windows 11
 - Administrator privileges
 - Winget (Windows Package Manager) - built into modern Windows
 
-## How to Use
-
-### Method 1: Run with Bypass (Recommended)
-
-1. Download the script to your device
-2. Right-click **PowerShell** and select **"Run as Administrator"**
-3. Navigate to the script location:
-   ```powershell
-   cd C:\path\to\script
-   ```
-4. Run with execution policy bypass:
-   ```powershell
-   PowerShell -ExecutionPolicy Bypass -File ".\install-software.ps1"
-   ```
-
-### Method 2: Unblock the File
-
-1. Right-click the `.ps1` file
-2. Select **Properties**
-3. Check **"Unblock"** at the bottom
-4. Click **OK**
-5. Right-click **PowerShell** and select **"Run as Administrator"**
-6. Run the script:
-   ```powershell
-   .\install-software.ps1
-   ```
-
-### Method 3: Set Execution Policy (Current User Only)
-
-1. Right-click **PowerShell** and select **"Run as Administrator"**
-2. Run:
-   ```powershell
-   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-   ```
-3. Type `Y` and press Enter
-4. Run the script:
-   ```powershell
-   .\install-software.ps1
-   ```
-
 ## Script Workflow
 
 The script will prompt you through the following steps:
 
 1. **Change Device Name** (Optional)
-   - Enter new computer name or skip
-
-2. **Install Software Packages**
-   - Automatically installs all listed applications
-
-3. **Disable Fast Startup**
-   - Improves dual-boot compatibility and ensures clean shutdowns
-
+2. **Install Software Packages** - Automatically installs all listed applications
+3. **Disable Fast Startup** - Improves dual-boot compatibility and ensures clean shutdowns
 4. **Configure ClientAdmin Account** (Optional)
-   - Set password for existing ClientAdmin account
-
 5. **Create New Local User** (Optional)
-   - Create a new administrator account with custom credentials
-
-6. **Install Windows Updates** (Optional)
-   - Scans and installs all available Windows updates
-   - May take significant time depending on update size
-
-7. **Run HP Image Assistant** (Optional)
-   - Launches HPIA for HP driver updates
-   - Only available on HP devices
-
-8. **Restart Prompt**
-   - Offers to restart if changes require it
+6. **Install Windows Updates** (Optional) - May take significant time depending on update size
+7. **Run HP Image Assistant** (Optional) - Only available on HP devices
+8. **Restart Prompt** - Offers to restart if changes require it
 
 ## Notes
 
@@ -105,9 +56,6 @@ The script will prompt you through the following steps:
 - A restart may be required after completion
 
 ## Troubleshooting
-
-**"Scripts are disabled on this system"**
-- Use Method 1 (Bypass) or Method 2 (Unblock) above
 
 **"HP Image Assistant not found"**
 - Ensure HP Image Assistant installed correctly
