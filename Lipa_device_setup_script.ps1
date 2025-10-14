@@ -47,10 +47,10 @@ Write-Host ""
 # Define packages to install with their Winget IDs
 $packages = @(
     @{Name="RustDesk"; ID="RustDesk.RustDesk"},
-    @{Name="Mozilla Firefox"; ID="Mozilla.Firefox"},
+    @{Name="Mozilla Firefox"; ID="9NZVDKPMR9RD"},
     @{Name="Google Chrome"; ID="Google.Chrome"},
-    @{Name="Foxit PDF Reader"; ID="Foxit.FoxitReader"},
-    @{Name="Adobe Acrobat Reader"; ID="Adobe.Acrobat.Reader.64-bit"},
+    @{Name="Foxit PDF Reader"; ID="XPFCG5NRKXQPKT"},
+    @{Name="Adobe Acrobat Reader"; ID="XPDP273C0XHQH2"},
     @{Name="HP Image Assistant"; ID="HP.ImageAssistant"}
 )
 
