@@ -345,6 +345,51 @@ if ($runHPIA -eq "Y" -or $runHPIA -eq "y") {
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Configuration Summary" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+
+# Display device name
+if ($changeComputerName -eq "Y" -or $changeComputerName -eq "y") {
+    if ($newComputerName) {
+        Write-Host "Device Name: $newComputerName" -ForegroundColor Green
+    }
+} else {
+    Write-Host "Device Name: $currentComputerName (unchanged)" -ForegroundColor Yellow
+}
+
+Write-Host ""
+
+# Display user accounts
+Write-Host "User Accounts:" -ForegroundColor Cyan
+if ($configureClientAdmin -eq "Y" -or $configureClientAdmin -eq "y") {
+    # Convert SecureString to plain text for display
+    if ($clientAdminPassword) {
+        $clientAdminPwd = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($clientAdminPassword))
+        Write-Host "  Clientadmin -> $clientAdminPwd" -ForegroundColor White
+    }
+}
+
+if ($createLocalUser -eq "Y" -or $createLocalUser -eq "y") {
+    if ($newUsername -and $newUserPassword) {
+        # Convert SecureString to plain text for display
+        $localUserPwd = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($newUserPassword))
+        Write-Host "  $newUsername -> $localUserPwd" -ForegroundColor White
+    }
+}
+
+Write-Host ""
+
+# Display installed packages
+Write-Host "Installed Packages:" -ForegroundColor Cyan
+$packageNumber = 1
+foreach ($pkg in $packages) {
+    Write-Host "  $packageNumber. $($pkg.Name)" -ForegroundColor White
+    $packageNumber++
+}
+
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "All Tasks Complete!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
