@@ -51,7 +51,11 @@ $packages = @(
     @{Name="Google Chrome"; ID="Google.Chrome"},
     @{Name="Foxit PDF Reader"; ID="XPFCG5NRKXQPKT"},
     @{Name="Adobe Acrobat Reader"; ID="XPDP273C0XHQH2"},
-    @{Name="HP Image Assistant"; ID="HP.ImageAssistant"}
+    @{Name="HP Image Assistant"; ID="HP.ImageAssistant"},
+    @{Name="HP Programmable Key"; ID="9MW15F21R5G8"},
+    @{Name="Belgium e-ID viewer"; ID="BelgianGovernment.eIDViewer"},
+    @{Name="Belgium e-ID middleware"; ID="BelgianGovernment.eIDmiddleware"},
+    @{Name="MS365 Apps"; ID="Microsoft.Office"}
 )
 
 # Install each package
