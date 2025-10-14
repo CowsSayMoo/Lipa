@@ -16,7 +16,9 @@ Write-Host "System Configuration Script" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Change device name
+# ========================================
+# STEP 1: CHANGE DEVICE NAME
+# ========================================
 $currentComputerName = $env:COMPUTERNAME
 Write-Host "Current device name: $currentComputerName" -ForegroundColor Yellow
 Write-Host ""
@@ -41,69 +43,21 @@ if ($changeComputerName -eq "Y" -or $changeComputerName -eq "y") {
 }
 
 Write-Host ""
-Write-Host "Starting software installation..." -ForegroundColor Green
-Write-Host ""
-
-# Define packages to install with their Winget IDs
-$packages = @(
-    @{Name="RustDesk"; ID="RustDesk.RustDesk"},
-    @{Name="Mozilla Firefox"; ID="9NZVDKPMR9RD"},
-    @{Name="Google Chrome"; ID="Google.Chrome"},
-    @{Name="Foxit PDF Reader"; ID="XPFCG5NRKXQPKT"},
-    @{Name="Adobe Acrobat Reader"; ID="XPDP273C0XHQH2"},
-    @{Name="HP Image Assistant"; ID="HP.ImageAssistant"},
-    @{Name="HP Programmable Key"; ID="9MW15F21R5G8"},
-    @{Name="Belgium e-ID viewer"; ID="BelgianGovernment.eIDViewer"},
-    @{Name="Belgium e-ID middleware"; ID="BelgianGovernment.eIDmiddleware"},
-    @{Name="MS365 Apps"; ID="Microsoft.Office"}
-)
-
-# Install each package
-foreach ($pkg in $packages) {
-    Write-Host "Installing $($pkg.Name)..." -ForegroundColor Cyan
-    
-    try {
-        winget install --id $($pkg.ID) --silent --accept-package-agreements --accept-source-agreements
-        
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "✓ $($pkg.Name) installed successfully" -ForegroundColor Green
-        } else {
-            Write-Host "✗ $($pkg.Name) installation failed or was already installed" -ForegroundColor Yellow
-        }
-    }
-    catch {
-        Write-Host "✗ Error installing $($pkg.Name): $_" -ForegroundColor Red
-    }
-    
-    Write-Host ""
-}
-
-Write-Host "Installation process completed!" -ForegroundColor Green
-Write-Host ""
-
-# Disable Fast Startup
-Write-Host "Disabling Fast Startup..." -ForegroundColor Cyan
-
-try {
-    $regPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power"
-    $regName = "HiberbootEnabled"
-    
-    Set-ItemProperty -Path $regPath -Name $regName -Value 0 -Type DWord
-    
-    Write-Host "✓ Fast Startup has been disabled" -ForegroundColor Green
-    Write-Host "  (Change will take effect after restart)" -ForegroundColor Yellow
-}
-catch {
-    Write-Host "✗ Error disabling Fast Startup: $_" -ForegroundColor Red
-}
-
-Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "User Account Configuration" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Configure ClientAdmin account password
+# ========================================
+# STEP 2: USER ACCOUNT CONFIGURATION
+# ========================================
+
+# Ask if device will be added to a domain
+$isDomainDevice = Read-Host "Will this device be added to a domain? (Y/N)"
+
+Write-Host ""
+
+# Configure ClientAdmin account password (for both domain and local devices)
 $configureClientAdmin = Read-Host "Do you want to configure the ClientAdmin account password? (Y/N)"
 
 if ($configureClientAdmin -eq "Y" -or $configureClientAdmin -eq "y") {
@@ -139,54 +93,137 @@ if ($configureClientAdmin -eq "Y" -or $configureClientAdmin -eq "y") {
 
 Write-Host ""
 
-# Create new local user
-$createLocalUser = Read-Host "Do you want to create a new local user account? (Y/N)"
-
-if ($createLocalUser -eq "Y" -or $createLocalUser -eq "y") {
+# For local (non-domain) devices, create an additional local user
+if ($isDomainDevice -ne "Y" -and $isDomainDevice -ne "y") {
+    Write-Host "Local Device - Additional User Account" -ForegroundColor Cyan
+    Write-Host "----------------------------------------" -ForegroundColor Cyan
     Write-Host ""
-    $newUsername = Read-Host "Enter username for the new local user"
     
-    if ($newUsername) {
-        try {
-            # Check if user already exists
-            $userExists = Get-LocalUser -Name $newUsername -ErrorAction SilentlyContinue
-            
-            if ($userExists) {
-                Write-Host "✗ User '$newUsername' already exists" -ForegroundColor Yellow
-            } else {
-                $newUserPassword = Read-Host "Enter password for $newUsername" -AsSecureString
-                $newUserPasswordConfirm = Read-Host "Confirm password" -AsSecureString
+    $createLocalUser = Read-Host "Do you want to create an additional local user account? (Y/N)"
+
+    if ($createLocalUser -eq "Y" -or $createLocalUser -eq "y") {
+        Write-Host ""
+        $newUsername = Read-Host "Enter username for the new local user"
+        
+        if ($newUsername) {
+            try {
+                # Check if user already exists
+                $userExists = Get-LocalUser -Name $newUsername -ErrorAction SilentlyContinue
                 
-                # Convert SecureString to plain text for comparison
-                $newPwd1 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($newUserPassword))
-                $newPwd2 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($newUserPasswordConfirm))
-                
-                if ($newPwd1 -eq $newPwd2) {
-                    # Create the user
-                    New-LocalUser -Name $newUsername -Password $newUserPassword -FullName $newUsername -Description "Local Administrator Account"
-                    Write-Host "✓ User '$newUsername' has been created" -ForegroundColor Green
-                    
-                    # Add to Administrators group
-                    Add-LocalGroupMember -Group "Administrators" -Member $newUsername
-                    Write-Host "✓ User '$newUsername' has been added to the Administrators group" -ForegroundColor Green
+                if ($userExists) {
+                    Write-Host "✗ User '$newUsername' already exists" -ForegroundColor Yellow
                 } else {
-                    Write-Host "✗ Passwords do not match. User was not created." -ForegroundColor Red
+                    $newUserPassword = Read-Host "Enter password for $newUsername" -AsSecureString
+                    $newUserPasswordConfirm = Read-Host "Confirm password" -AsSecureString
+                    
+                    # Convert SecureString to plain text for comparison
+                    $newPwd1 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($newUserPassword))
+                    $newPwd2 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($newUserPasswordConfirm))
+                    
+                    if ($newPwd1 -eq $newPwd2) {
+                        # Create the user
+                        New-LocalUser -Name $newUsername -Password $newUserPassword -FullName $newUsername -Description "Local User Account"
+                        Write-Host "✓ User '$newUsername' has been created" -ForegroundColor Green
+                        
+                        # Add to Administrators group
+                        Add-LocalGroupMember -Group "Administrators" -Member $newUsername
+                        Write-Host "✓ User '$newUsername' has been added to the Administrators group" -ForegroundColor Green
+                    } else {
+                        Write-Host "✗ Passwords do not match. User was not created." -ForegroundColor Red
+                    }
                 }
             }
-        }
-        catch {
-            Write-Host "✗ Error creating user account: $_" -ForegroundColor Red
+            catch {
+                Write-Host "✗ Error creating user account: $_" -ForegroundColor Red
+            }
         }
     }
+} else {
+    Write-Host "Domain Device - No additional local user needed" -ForegroundColor Yellow
+    Write-Host "Domain users will be configured after joining the device to the domain" -ForegroundColor Yellow
 }
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Configuration Complete!" -ForegroundColor Green
+Write-Host "System Configuration" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Windows Updates
+# ========================================
+# STEP 3: DISABLE FAST STARTUP
+# ========================================
+
+Write-Host "Disabling Fast Startup..." -ForegroundColor Cyan
+
+try {
+    $regPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power"
+    $regName = "HiberbootEnabled"
+    
+    Set-ItemProperty -Path $regPath -Name $regName -Value 0 -Type DWord
+    
+    Write-Host "✓ Fast Startup has been disabled" -ForegroundColor Green
+    Write-Host "  (Change will take effect after restart)" -ForegroundColor Yellow
+}
+catch {
+    Write-Host "✗ Error disabling Fast Startup: $_" -ForegroundColor Red
+}
+
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Software Installation" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+
+# ========================================
+# STEP 4: INSTALL SOFTWARE PACKAGES
+# ========================================
+
+# Define packages to install with their Winget IDs
+$packages = @(
+    @{Name="RustDesk"; ID="RustDesk.RustDesk"},
+    @{Name="Mozilla Firefox"; ID="9NZVDKPMR9RD"},
+    @{Name="Google Chrome"; ID="Google.Chrome"},
+    @{Name="Foxit PDF Reader"; ID="XPFCG5NRKXQPKT"},
+    @{Name="Adobe Acrobat Reader"; ID="XPDP273C0XHQH2"},
+    @{Name="HP Image Assistant"; ID="HP.ImageAssistant"},
+    @{Name="HP Programmable Key"; ID="9MW15F21R5G8"},
+    @{Name="Belgium e-ID viewer"; ID="BelgianGovernment.eIDViewer"},
+    @{Name="Belgium e-ID middleware"; ID="BelgianGovernment.eIDmiddleware"},
+    @{Name="MS365 Apps"; ID="Microsoft.Office"}
+)
+
+# Install each package
+foreach ($pkg in $packages) {
+    Write-Host "Installing $($pkg.Name)..." -ForegroundColor Cyan
+    
+    try {
+        winget install --id $($pkg.ID) --silent --accept-package-agreements --accept-source-agreements
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "✓ $($pkg.Name) installed successfully" -ForegroundColor Green
+        } else {
+            Write-Host "✗ $($pkg.Name) installation failed or was already installed" -ForegroundColor Yellow
+        }
+    }
+    catch {
+        Write-Host "✗ Error installing $($pkg.Name): $_" -ForegroundColor Red
+    }
+    
+    Write-Host ""
+}
+
+Write-Host "Software installation completed!" -ForegroundColor Green
+Write-Host ""
+
+# ========================================
+# STEP 5: WINDOWS UPDATES
+# ========================================
+
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Windows Updates" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+
 $installUpdates = Read-Host "Do you want to install Windows Updates now? (Y/N)"
 
 if ($installUpdates -eq "Y" -or $installUpdates -eq "y") {
@@ -196,18 +233,30 @@ if ($installUpdates -eq "Y" -or $installUpdates -eq "y") {
     Write-Host ""
     
     try {
+        # Set execution policy for current process to allow module import
+        Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
+        
+        # Install NuGet provider if not present
+        Write-Host "Checking NuGet provider..." -ForegroundColor Cyan
+        $nuget = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue
+        if (-not $nuget) {
+            Write-Host "Installing NuGet provider..." -ForegroundColor Cyan
+            Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Confirm:$false | Out-Null
+            Write-Host "✓ NuGet provider installed" -ForegroundColor Green
+        }
+        
         # Check if PSWindowsUpdate module is installed
         $psWindowsUpdate = Get-Module -ListAvailable -Name PSWindowsUpdate
         
         if (-not $psWindowsUpdate) {
             Write-Host "Installing PSWindowsUpdate module..." -ForegroundColor Cyan
-            Install-Module -Name PSWindowsUpdate -Force -SkipPublisherCheck
+            Install-Module -Name PSWindowsUpdate -Force -SkipPublisherCheck -Confirm:$false
             Write-Host "✓ PSWindowsUpdate module installed" -ForegroundColor Green
             Write-Host ""
         }
         
         # Import the module
-        Import-Module PSWindowsUpdate
+        Import-Module PSWindowsUpdate -Force
         
         # Get available updates
         Write-Host "Scanning for available updates..." -ForegroundColor Cyan
@@ -246,8 +295,10 @@ if ($installUpdates -eq "Y" -or $installUpdates -eq "y") {
     Write-Host ""
 }
 
-# Run HP Image Assistant
-Write-Host ""
+# ========================================
+# STEP 6: HP IMAGE ASSISTANT
+# ========================================
+
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "HP Image Assistant" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
@@ -287,6 +338,10 @@ if ($runHPIA -eq "Y" -or $runHPIA -eq "y") {
     
     Write-Host ""
 }
+
+# ========================================
+# COMPLETION AND RESTART
+# ========================================
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
