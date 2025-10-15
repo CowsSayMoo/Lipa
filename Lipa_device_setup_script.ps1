@@ -415,7 +415,11 @@ Write-Host "Creating Summary File..." -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-$deviceName = if ($newComputerName) { $newComputerName } else { $env:COMPUTERNAME }
+if ($newComputerName) {
+    $deviceName = $newComputerName
+} else {
+    $deviceName = $env:COMPUTERNAME
+}
 
 $summaryContent = @"
 ========================================
