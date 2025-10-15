@@ -281,7 +281,7 @@ if ($installUpdates -eq "Y" -or $installUpdates -eq "y") {
         # Install PSWindowsUpdate module, which will also handle the NuGet provider dependency
         if (-not (Get-Module -ListAvailable -Name PSWindowsUpdate)) {
             Write-Host "Installing PSWindowsUpdate module (and dependencies like NuGet)..." -ForegroundColor Cyan
-            Install-Module -Name PSWindowsUpdate -Force -SkipPublisherCheck -Confirm:$false -AcceptLicense
+            Install-Module -Name PSWindowsUpdate -Force -SkipPublisherCheck -Confirm:$false
             Write-Host "✓ PSWindowsUpdate module installed" -ForegroundColor Green
             Write-Host ""
         }
