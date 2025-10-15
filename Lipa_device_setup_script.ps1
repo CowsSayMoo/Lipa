@@ -377,7 +377,36 @@ if ($runHPIA -eq "Y" -or $runHPIA -eq "y") {
 }
 
 # ========================================
-# STEP 8: CREATE SUMMARY FILE AND RESTART
+# STEP 8: JOIN DOMAIN (if applicable)
+# ========================================
+
+if ($isDomainDevice -eq "Y" -or $isDomainDevice -eq "y") {
+    Write-Host ""
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host "Join Domain" -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host ""
+
+    $joinDomain = Read-Host "Do you want to join this device to a domain now? (Y/N)"
+    if ($joinDomain -eq 'Y' -or $joinDomain -eq 'y') {
+        $domainName = Read-Host "Enter the domain name to join"
+        if ($domainName) {
+            try {
+                $credential = Get-Credential
+                Add-Computer -DomainName $domainName -Credential $credential
+                Write-Host "✓ Computer will be joined to domain '$domainName' after restart." -ForegroundColor Green
+                $requiresRestart = $true
+            }
+            catch {
+                Write-ErrorLog -Message "Failed to join domain '$_'"
+            }
+        }
+    }
+}
+
+
+# ========================================
+# STEP 9: CREATE SUMMARY FILE AND RESTART
 # ========================================
 
 Write-Host ""
