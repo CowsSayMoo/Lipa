@@ -274,20 +274,13 @@ if ($installUpdates -eq "Y" -or $installUpdates -eq "y") {
         # Set execution policy for current process to allow module import
         Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
         
-        # Install NuGet provider if not present
-        Write-Host "Checking NuGet provider..." -ForegroundColor Cyan
-        $nuget = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue
-        if (-not $nuget) {
-            Write-Host "Installing NuGet provider..." -ForegroundColor Cyan
-            Install-PackageProvider -Name NuGet -Force | Out-Null
-            Write-Host "✓ NuGet provider installed" -ForegroundColor Green
-        }
+        # Trust the PSGallery repository to avoid security prompts
+        Write-Host "Setting PSGallery repository to 'Trusted' to avoid prompts..." -ForegroundColor Yellow
+        Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
         
-        # Check if PSWindowsUpdate module is installed
-        $psWindowsUpdate = Get-Module -ListAvailable -Name PSWindowsUpdate
-        
-        if (-not $psWindowsUpdate) {
-            Write-Host "Installing PSWindowsUpdate module..." -ForegroundColor Cyan
+        # Install PSWindowsUpdate module, which will also handle the NuGet provider dependency
+        if (-not (Get-Module -ListAvailable -Name PSWindowsUpdate)) {
+            Write-Host "Installing PSWindowsUpdate module (and dependencies like NuGet)..." -ForegroundColor Cyan
             Install-Module -Name PSWindowsUpdate -Force -SkipPublisherCheck -Confirm:$false -AcceptLicense
             Write-Host "✓ PSWindowsUpdate module installed" -ForegroundColor Green
             Write-Host ""
