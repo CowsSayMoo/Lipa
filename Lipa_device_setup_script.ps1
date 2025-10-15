@@ -1,23 +1,51 @@
 # Software Installation Script using Winget
 # Run this script as Administrator
 
+# --- INITIAL SETUP ---
+# Log file setup
+$logFile = "$env:USERPROFILE\Desktop\lipa_setup_error_logs.txt"
+$ticketFile = "$env:USERPROFILE\Desktop\lipa_setup_ticket_entry.txt"
+$installedPackages = @() # Array to track successfully installed packages
+
+# Function to log errors to file and console
+function Write-ErrorLog {
+    param(
+        [string]$Message
+    )
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $logMessage = "[$timestamp] ERROR: $Message"
+    
+    # Write to console
+    Write-Host "✗ $Message" -ForegroundColor Red
+    
+    # Write to log file
+    Add-Content -Path $logFile -Value $logMessage
+}
+
+# --- SCRIPT START ---
 # Check if running as Administrator
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 if (-not $isAdmin) {
-    Write-Host "ERROR: This script must be run as Administrator!" -ForegroundColor Red
-    Write-Host "Please right-click PowerShell and select 'Run as Administrator'" -ForegroundColor Yellow
+    Write-ErrorLog -Message "This script must be run as Administrator! Please right-click PowerShell and select 'Run as Administrator'."
     pause
     exit
 }
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "System Configuration Script" -ForegroundColor Cyan
+Write-Host "Lipa System Configuration Script" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 # ========================================
-# STEP 1: CHANGE DEVICE NAME
+# STEP 1: DETERMINE DEVICE TYPE (DOMAIN OR LOCAL)
+# ========================================
+$isDomainDevice = Read-Host "Will this device be added to a domain? (Y/N)"
+Write-Host ""
+
+
+# ========================================
+# STEP 2: CHANGE DEVICE NAME
 # ========================================
 $currentComputerName = $env:COMPUTERNAME
 Write-Host "Current device name: $currentComputerName" -ForegroundColor Yellow
@@ -35,7 +63,7 @@ if ($changeComputerName -eq "Y" -or $changeComputerName -eq "y") {
             $requiresRestart = $true
         }
         catch {
-            Write-Host "✗ Error changing device name: $_" -ForegroundColor Red
+            Write-ErrorLog -Message "Error changing device name: $_"
         }
     } elseif ($newComputerName -eq $currentComputerName) {
         Write-Host "Device name is already '$currentComputerName'" -ForegroundColor Yellow
@@ -49,13 +77,8 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 # ========================================
-# STEP 2: USER ACCOUNT CONFIGURATION
+# STEP 3: USER ACCOUNT CONFIGURATION
 # ========================================
-
-# Ask if device will be added to a domain
-$isDomainDevice = Read-Host "Will this device be added to a domain? (Y/N)"
-
-Write-Host ""
 
 # Configure ClientAdmin account password (for both domain and local devices)
 $configureClientAdmin = Read-Host "Do you want to configure the ClientAdmin account password? (Y/N)"
@@ -80,14 +103,14 @@ if ($configureClientAdmin -eq "Y" -or $configureClientAdmin -eq "y") {
                 Set-LocalUser -Name "ClientAdmin" -Password $clientAdminPassword
                 Write-Host "✓ ClientAdmin password has been updated" -ForegroundColor Green
             } else {
-                Write-Host "✗ Passwords do not match. ClientAdmin password was not changed." -ForegroundColor Red
+                Write-ErrorLog -Message "Passwords do not match. ClientAdmin password was not changed."
             }
         } else {
             Write-Host "✗ ClientAdmin account does not exist on this system" -ForegroundColor Yellow
         }
     }
     catch {
-        Write-Host "✗ Error configuring ClientAdmin account: $_" -ForegroundColor Red
+        Write-ErrorLog -Message "Error configuring ClientAdmin account: $_"
     }
 }
 
@@ -129,12 +152,12 @@ if ($isDomainDevice -ne "Y" -and $isDomainDevice -ne "y") {
                         Add-LocalGroupMember -Group "Administrators" -Member $newUsername
                         Write-Host "✓ User '$newUsername' has been added to the Administrators group" -ForegroundColor Green
                     } else {
-                        Write-Host "✗ Passwords do not match. User was not created." -ForegroundColor Red
+                        Write-ErrorLog -Message "Passwords do not match. User was not created."
                     }
                 }
             }
             catch {
-                Write-Host "✗ Error creating user account: $_" -ForegroundColor Red
+                Write-ErrorLog -Message "Error creating user account: $_"
             }
         }
     }
@@ -150,7 +173,7 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 # ========================================
-# STEP 3: DISABLE FAST STARTUP
+# STEP 4: DISABLE FAST STARTUP
 # ========================================
 
 Write-Host "Disabling Fast Startup..." -ForegroundColor Cyan
@@ -165,7 +188,7 @@ try {
     Write-Host "  (Change will take effect after restart)" -ForegroundColor Yellow
 }
 catch {
-    Write-Host "✗ Error disabling Fast Startup: $_" -ForegroundColor Red
+    Write-ErrorLog -Message "Error disabling Fast Startup: $_"
 }
 
 Write-Host ""
@@ -175,10 +198,10 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 # ========================================
-# STEP 4: INSTALL SOFTWARE PACKAGES
+# STEP 5: INSTALL SOFTWARE PACKAGES
 # ========================================
 
-# Define packages to install with their Winget IDs
+# Define base packages to install with their Winget IDs
 $packages = @(
     @{Name="RustDesk"; ID="RustDesk.RustDesk"},
     @{Name="Mozilla Firefox"; ID="Mozilla.Firefox"},
@@ -192,21 +215,32 @@ $packages = @(
     @{Name="MS365 Apps"; ID="Microsoft.Office"}
 )
 
+# Add domain-specific packages
+if ($isDomainDevice -eq "Y" -or $isDomainDevice -eq "y") {
+    $packages += @{Name="OpenVPN Connect"; ID="OpenVPNTechnologies.OpenVPNConnect"}
+}
+
+
 # Install each package
 foreach ($pkg in $packages) {
     Write-Host "Installing $($pkg.Name)..." -ForegroundColor Cyan
     
     try {
-        winget install --id $($pkg.ID) --silent --accept-package-agreements --accept-source-agreements
+        if ($pkg.ID -eq "Google.Chrome") {
+            winget install --id $($pkg.ID) --silent --accept-package-agreements --accept-source-agreements --force --scope user
+        } else {
+            winget install --id $($pkg.ID) --silent --accept-package-agreements --accept-source-agreements
+        }
         
         if ($LASTEXITCODE -eq 0) {
             Write-Host "✓ $($pkg.Name) installed successfully" -ForegroundColor Green
+            $installedPackages += $pkg.Name
         } else {
             Write-Host "✗ $($pkg.Name) installation failed or was already installed" -ForegroundColor Yellow
         }
     }
     catch {
-        Write-Host "✗ Error installing $($pkg.Name): $_" -ForegroundColor Red
+        Write-ErrorLog -Message "Error installing $($pkg.Name): $_"
     }
     
     Write-Host ""
@@ -216,7 +250,7 @@ Write-Host "Software installation completed!" -ForegroundColor Green
 Write-Host ""
 
 # ========================================
-# STEP 5: WINDOWS UPDATES
+# STEP 6: WINDOWS UPDATES
 # ========================================
 
 Write-Host "========================================" -ForegroundColor Cyan
@@ -279,15 +313,14 @@ if ($installUpdates -eq "Y" -or $installUpdates -eq "y") {
             Write-Host "✓ Windows Updates installed successfully" -ForegroundColor Green
             
             # Check if restart is required
-            $rebootRequired = Get-WURebootStatus -Silent
-            if ($rebootRequired) {
+            if (Get-WURebootStatus -Silent) {
                 Write-Host "⚠ A restart is required to complete the updates" -ForegroundColor Yellow
                 $requiresRestart = $true
             }
         }
     }
     catch {
-        Write-Host "✗ Error installing Windows Updates: $_" -ForegroundColor Red
+        Write-ErrorLog -Message "Error installing Windows Updates: $_"
         Write-Host ""
         Write-Host "You can manually check for updates in Windows Settings > Update & Security > Windows Update" -ForegroundColor Yellow
     }
@@ -296,7 +329,7 @@ if ($installUpdates -eq "Y" -or $installUpdates -eq "y") {
 }
 
 # ========================================
-# STEP 6: HP IMAGE ASSISTANT
+# STEP 7: HP IMAGE ASSISTANT
 # ========================================
 
 Write-Host "========================================" -ForegroundColor Cyan
@@ -327,65 +360,63 @@ if ($runHPIA -eq "Y" -or $runHPIA -eq "y") {
             Write-Host ""
             Write-Host "✓ HP Image Assistant completed" -ForegroundColor Green
         } else {
-            Write-Host "✗ HP Image Assistant executable not found at: $hpiaPath" -ForegroundColor Red
+            Write-ErrorLog -Message "HP Image Assistant executable not found at: $hpiaPath"
             Write-Host "Please ensure HP Image Assistant was installed correctly" -ForegroundColor Yellow
             Write-Host "You can run it manually from the Start Menu" -ForegroundColor Yellow
         }
     }
     catch {
-        Write-Host "✗ Error running HP Image Assistant: $_" -ForegroundColor Red
+        Write-ErrorLog -Message "Error running HP Image Assistant: $_"
     }
     
     Write-Host ""
 }
 
 # ========================================
-# COMPLETION AND RESTART
+# STEP 8: CREATE SUMMARY FILE AND RESTART
 # ========================================
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Configuration Summary" -ForegroundColor Cyan
+Write-Host "Creating Summary File..." -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Display device name
-if ($changeComputerName -eq "Y" -or $changeComputerName -eq "y") {
-    if ($newComputerName) {
-        Write-Host "Device Name: $newComputerName" -ForegroundColor Green
-    }
-} else {
-    Write-Host "Device Name: $currentComputerName (unchanged)" -ForegroundColor Yellow
+$deviceName = if ($newComputerName) { $newComputerName } else { $env:COMPUTERNAME }
+
+$summaryContent = @"
+========================================
+Lipa Setup Ticket Entry
+========================================
+
+Device Name: $deviceName
+
+--- User Accounts ---
+"@
+
+if ($clientAdminPassword) {
+    $clientAdminPwd = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($clientAdminPassword))
+    $summaryContent += "`nClientAdmin: $clientAdminPwd"
 }
 
-Write-Host ""
-
-# Display user accounts
-Write-Host "User Accounts:" -ForegroundColor Cyan
-if ($configureClientAdmin -eq "Y" -or $configureClientAdmin -eq "y") {
-    # Convert SecureString to plain text for display
-    if ($clientAdminPassword) {
-        $clientAdminPwd = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($clientAdminPassword))
-        Write-Host "  Clientadmin -> $clientAdminPwd" -ForegroundColor White
-    }
+if ($newUserPassword) {
+    $localUserPwd = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($newUserPassword))
+    $summaryContent += "`n$newUsername: $localUserPwd"
 }
 
-if ($createLocalUser -eq "Y" -or $createLocalUser -eq "y") {
-    if ($newUsername -and $newUserPassword) {
-        # Convert SecureString to plain text for display
-        $localUserPwd = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($newUserPassword))
-        Write-Host "  $newUsername -> $localUserPwd" -ForegroundColor White
-    }
+$summaryContent += "`n`n--- Installed Packages ---"
+foreach ($pkgName in $installedPackages) {
+    $summaryContent += "`n- $pkgName"
 }
 
-Write-Host ""
+$summaryContent += "`n`n========================================"
 
-# Display installed packages
-Write-Host "Installed Packages:" -ForegroundColor Cyan
-$packageNumber = 1
-foreach ($pkg in $packages) {
-    Write-Host "  $packageNumber. $($pkg.Name)" -ForegroundColor White
-    $packageNumber++
+try {
+    Set-Content -Path $ticketFile -Value $summaryContent
+    Write-Host "✓ Summary file created at: $ticketFile" -ForegroundColor Green
+}
+catch {
+    Write-ErrorLog -Message "Failed to create summary file: $_"
 }
 
 Write-Host ""
@@ -398,13 +429,7 @@ if ($requiresRestart) {
     Write-Host "========================================" -ForegroundColor Yellow
     Write-Host "RESTART REQUIRED" -ForegroundColor Yellow
     Write-Host "========================================" -ForegroundColor Yellow
-    Write-Host "A restart is required for the following changes:" -ForegroundColor Yellow
-    if ($changeComputerName -eq "Y" -or $changeComputerName -eq "y") {
-        Write-Host "  - Device name change" -ForegroundColor Yellow
-    }
-    if ($installUpdates -eq "Y" -or $installUpdates -eq "y") {
-        Write-Host "  - Windows Updates" -ForegroundColor Yellow
-    }
+    Write-Host "A restart is required to apply some changes." -ForegroundColor Yellow
     Write-Host ""
     
     $restartNow = Read-Host "Would you like to restart now? (Y/N)"
