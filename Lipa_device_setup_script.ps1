@@ -92,18 +92,20 @@ if ($configureClientAdmin -eq "Y" -or $configureClientAdmin -eq "y") {
         $clientAdminExists = Get-LocalUser -Name "ClientAdmin" -ErrorAction SilentlyContinue
         
         if ($clientAdminExists) {
-            $clientAdminPassword = Read-Host "Enter new password for ClientAdmin" -AsSecureString
-            $clientAdminPasswordConfirm = Read-Host "Confirm password" -AsSecureString
-            
-            # Convert SecureString to plain text for comparison
-            $pwd1 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($clientAdminPassword))
-            $pwd2 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($clientAdminPasswordConfirm))
-            
-            if ($pwd1 -eq $pwd2) {
-                Set-LocalUser -Name "ClientAdmin" -Password $clientAdminPassword
-                Write-Host "✓ ClientAdmin password has been updated" -ForegroundColor Green
-            } else {
-                Write-ErrorLog -Message "Passwords do not match. ClientAdmin password was not changed."
+            while ($true) {
+                $clientAdminPassword = Read-Host "Enter new password for ClientAdmin" -AsSecureString
+                $clientAdminPasswordConfirm = Read-Host "Confirm password" -AsSecureString
+                
+                $pwd1 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($clientAdminPassword))
+                $pwd2 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($clientAdminPasswordConfirm))
+                
+                if ($pwd1 -eq $pwd2) {
+                    Set-LocalUser -Name "ClientAdmin" -Password $clientAdminPassword
+                    Write-Host "✓ ClientAdmin password has been updated" -ForegroundColor Green
+                    break # Exit the loop
+                } else {
+                    Write-Host "✗ Passwords do not match. Please try again." -ForegroundColor Yellow
+                }
             }
         } else {
             Write-Host "✗ ClientAdmin account does not exist on this system" -ForegroundColor Yellow
@@ -136,23 +138,25 @@ if ($isDomainDevice -ne "Y" -and $isDomainDevice -ne "y") {
                 if ($userExists) {
                     Write-Host "✗ User '$newUsername' already exists" -ForegroundColor Yellow
                 } else {
-                    $newUserPassword = Read-Host "Enter password for $newUsername" -AsSecureString
-                    $newUserPasswordConfirm = Read-Host "Confirm password" -AsSecureString
-                    
-                    # Convert SecureString to plain text for comparison
-                    $newPwd1 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($newUserPassword))
-                    $newPwd2 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($newUserPasswordConfirm))
-                    
-                    if ($newPwd1 -eq $newPwd2) {
-                        # Create the user
-                        New-LocalUser -Name $newUsername -Password $newUserPassword -FullName $newUsername -Description "Local User Account"
-                        Write-Host "✓ User '$newUsername' has been created" -ForegroundColor Green
+                    while ($true) {
+                        $newUserPassword = Read-Host "Enter password for $newUsername" -AsSecureString
+                        $newUserPasswordConfirm = Read-Host "Confirm password" -AsSecureString
                         
-                        # Add to Administrators group
-                        Add-LocalGroupMember -Group "Administrators" -Member $newUsername
-                        Write-Host "✓ User '$newUsername' has been added to the Administrators group" -ForegroundColor Green
-                    } else {
-                        Write-ErrorLog -Message "Passwords do not match. User was not created."
+                        $newPwd1 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($newUserPassword))
+                        $newPwd2 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($newUserPasswordConfirm))
+                        
+                        if ($newPwd1 -eq $newPwd2) {
+                            # Create the user
+                            New-LocalUser -Name $newUsername -Password $newUserPassword -FullName $newUsername -Description "Local User Account"
+                            Write-Host "✓ User '$newUsername' has been created" -ForegroundColor Green
+                            
+                            # Add to Administrators group
+                            Add-LocalGroupMember -Group "Administrators" -Member $newUsername
+                            Write-Host "✓ User '$newUsername' has been added to the Administrators group" -ForegroundColor Green
+                            break # Exit the loop
+                        } else {
+                            Write-Host "✗ Passwords do not match. Please try again." -ForegroundColor Yellow
+                        }
                     }
                 }
             }
