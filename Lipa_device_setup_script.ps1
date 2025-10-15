@@ -231,7 +231,7 @@ foreach ($pkg in $packages) {
     
     try {
         if ($pkg.ID -eq "Google.Chrome") {
-            winget install --id $($pkg.ID) --silent --accept-package-agreements --accept-source-agreements --force --scope user
+            winget install --id $($pkg.ID) --silent --accept-package-agreements --accept-source-agreements --force
         } else {
             winget install --id $($pkg.ID) --silent --accept-package-agreements --accept-source-agreements
         }
