@@ -438,7 +438,7 @@ if ($clientAdminPassword) {
 
 if ($newUserPassword) {
     $localUserPwd = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($newUserPassword))
-    $summaryContent += "`n$newUsername: $localUserPwd"
+    $summaryContent += "`n${newUsername}: $localUserPwd"
 }
 
 $summaryContent += "`n`n--- Installed Packages ---"
