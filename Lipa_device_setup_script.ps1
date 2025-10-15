@@ -398,7 +398,7 @@ if ($isDomainDevice -eq "Y" -or $isDomainDevice -eq "y") {
                 $requiresRestart = $true
             }
             catch {
-                Write-ErrorLog -Message "Failed to join domain '$_'"
+                Write-ErrorLog -Message "Failed to join domain $_"
             }
         }
     }
