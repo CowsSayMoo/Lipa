@@ -304,10 +304,18 @@ if ($installUpdates -eq "Y" -or $installUpdates -eq "y") {
             Write-Host "NOTE: This process may take a while depending on the number and size of updates" -ForegroundColor Yellow
             Write-Host ""
             
-            Install-WindowsUpdate -AcceptAll -AutoReboot:$false -Verbose
-            
-            Write-Host ""
-            Write-Host "✓ Windows Updates installed successfully" -ForegroundColor Green
+            $installResult = Install-WindowsUpdate -AcceptAll -AutoReboot:$false -Verbose
+            $failedUpdates = $installResult | Where-Object { $_.Status -eq 'Failed' }
+
+            if ($failedUpdates) {
+                Write-ErrorLog -Message "One or more Windows updates failed to install:"
+                foreach ($update in $failedUpdates) {
+                    Write-ErrorLog -Message "  - $($update.Title) (KB: $($update.KB))"
+                }
+            } else {
+                Write-Host ""
+                Write-Host "✓ Windows Updates installed successfully" -ForegroundColor Green
+            }
             
             # Check if restart is required
             if (Get-WURebootStatus -Silent) {
