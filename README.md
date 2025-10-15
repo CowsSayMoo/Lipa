@@ -1,74 +1,44 @@
 # Lipa Device Setup Script
 
-A PowerShell script to automate the initial setup and configuration of Windows devices.
+This PowerShell script automates the setup and configuration of a new Windows 11 device. It handles device naming, user account creation, system settings, software installation, and system updates.
 
-## Features
+## How to Use
 
-- **Device Name Configuration** - Change computer name
-- **Software Installation** - Automatically installs:
-  - RustDesk
-  - Mozilla Firefox
-  - Google Chrome
-  - Foxit PDF Reader
-  - Adobe Acrobat Reader
-  - HP Image Assistant
-- **System Configuration**
-  - Disables Fast Startup
-  - Configures ClientAdmin account password
-  - Creates new local administrator users
-- **Updates & Drivers**
-  - Installs all available Windows Updates
-  - Runs HP Image Assistant for driver updates (HP devices)
+1.  Clone or download the script to the target machine.
+2.  Open PowerShell **as an Administrator**.
+3.  Navigate to the directory containing the script.
+4.  Execute the script by running:
+    ```powershell
+    .\Lipa_device_setup_script.ps1
+    ```
+5.  Follow the on-screen prompts. The script will guide you through the configuration process.
 
-## Quick Start
+Upon completion, the script will generate two files on your Desktop:
+*   `lipa_setup_ticket_entry.txt`: A summary of the setup, including device name, credentials, and installed packages.
+*   `lipa_setup_error_logs.txt`: A log file that will only be created if errors occurred during the script's execution.
 
-Run this command in PowerShell as Administrator:
+## How to Customize Installed Software
 
-```powershell
-irm "https://raw.githubusercontent.com/CowsSayMoo/Lipa/main/Lipa_device_setup_script.ps1" | iex
-```
+You can easily add or remove software by editing the script.
 
-## Prerequisites
+1.  Open `Lipa_device_setup_script.ps1` in any text editor.
+2.  Locate the `$packages` array. It will look like this:
 
-- Windows 10 (version 1809+) or Windows 11
-- Administrator privileges
-- Winget (Windows Package Manager) - built into modern Windows
+    ```powershell
+    # Define base packages to install with their Winget IDs
+    $packages = @(
+        @{Name="RustDesk"; ID="RustDesk.RustDesk"},
+        @{Name="Mozilla Firefox"; ID="Mozilla.Firefox"},
+        @{Name="Google Chrome"; ID="Google.Chrome"}
+        # ... and so on
+    )
+    ```
 
-## Script Workflow
+3.  **To add software**, add a new line to this array. You will need the package `Name` and `ID`.
+4.  **To find package information**, use the `winget.run` community repository:
+    *   **[https://winget.run/](https://winget.run/)**
 
-The script will prompt you through the following steps:
+    For example, to add the VLC media player, you would search for it on `winget.run` and find its ID is `VideoLAN.VLC`. Then, you would add this line to the array:
+    `@{Name="VLC media player"; ID="VideoLAN.VLC"}`
 
-1. **Change Device Name** (Optional)
-2. **Install Software Packages** - Automatically installs all listed applications
-3. **Disable Fast Startup** - Improves dual-boot compatibility and ensures clean shutdowns
-4. **Configure ClientAdmin Account** (Optional)
-5. **Create New Local User** (Optional)
-6. **Install Windows Updates** (Optional) - May take significant time depending on update size
-7. **Run HP Image Assistant** (Optional) - Only available on HP devices
-8. **Restart Prompt** - Offers to restart if changes require it
-
-## Notes
-
-- The script requires Administrator privileges to run
-- Software installation uses the default Winget repository
-- HP Image Assistant path: `C:\SWSetup\HPImageAssistant\HPImageAssistant.exe`
-- Some operations may take several minutes to complete
-- A restart may be required after completion
-
-## Troubleshooting
-
-**"HP Image Assistant not found"**
-- Ensure HP Image Assistant installed correctly
-- Check if file exists at: `C:\SWSetup\HPImageAssistant\HPImageAssistant.exe`
-
-**"Package not found"**
-- Ensure internet connection is active
-- Winget may need to update its package list
-
-**Windows Updates failing**
-- PSWindowsUpdate module will be installed automatically
-- If issues persist, use Windows Settings to update manually
-
-## License
-
-Free to use and modify as needed.
+5.  **To remove software**, simply delete or comment out the corresponding line from the array.
