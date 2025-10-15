@@ -4,14 +4,14 @@ This PowerShell script automates the setup and configuration of a new Windows 11
 
 ## How to Use
 
-1.  Clone or download the script to the target machine.
-2.  Open PowerShell **as an Administrator**.
-3.  Navigate to the directory containing the script.
-4.  Execute the script by running:
+The script can be run directly from GitHub without needing to download any files.
+
+1.  Open PowerShell **as an Administrator**.
+2.  Run the following command. It will download and execute the script in memory:
     ```powershell
-    .\Lipa_device_setup_script.ps1
+    irm "https://raw.githubusercontent.com/CowsSayMoo/Lipa/main/Lipa_device_setup_script.ps1" | iex
     ```
-5.  Follow the on-screen prompts. The script will guide you through the configuration process.
+3.  Follow the on-screen prompts. The script will guide you through the configuration process.
 
 Upon completion, the script will generate two files on your Desktop:
 *   `lipa_setup_ticket_entry.txt`: A summary of the setup, including device name, credentials, and installed packages.
