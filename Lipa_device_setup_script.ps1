@@ -279,7 +279,7 @@ if ($installUpdates -eq "Y" -or $installUpdates -eq "y") {
         $nuget = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue
         if (-not $nuget) {
             Write-Host "Installing NuGet provider..." -ForegroundColor Cyan
-            Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Confirm:$false | Out-Null
+            Install-PackageProvider -Name NuGet -Force | Out-Null
             Write-Host "✓ NuGet provider installed" -ForegroundColor Green
         }
         
@@ -288,7 +288,7 @@ if ($installUpdates -eq "Y" -or $installUpdates -eq "y") {
         
         if (-not $psWindowsUpdate) {
             Write-Host "Installing PSWindowsUpdate module..." -ForegroundColor Cyan
-            Install-Module -Name PSWindowsUpdate -Force -SkipPublisherCheck -Confirm:$false
+            Install-Module -Name PSWindowsUpdate -Force -SkipPublisherCheck -Confirm:$false -AcceptLicense
             Write-Host "✓ PSWindowsUpdate module installed" -ForegroundColor Green
             Write-Host ""
         }
