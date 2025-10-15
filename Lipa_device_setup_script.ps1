@@ -421,32 +421,40 @@ if ($newComputerName) {
     $deviceName = $env:COMPUTERNAME
 }
 
-$summaryContent = @"
-========================================
-Lipa Setup Ticket Entry
-========================================
-
-Device Name: $deviceName
-
---- User Accounts ---
-"@
+$summaryLines = @(
+    "========================================"
+    "Lipa Setup Ticket Entry"
+    "========================================"
+    ""
+    "Device Name: $deviceName"
+    ""
+    "--- User Accounts ---"
+)
 
 if ($clientAdminPassword) {
     $clientAdminPwd = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($clientAdminPassword))
-    $summaryContent += "`nClientAdmin: $clientAdminPwd"
+    $summaryLines += "ClientAdmin: $clientAdminPwd"
 }
 
 if ($newUserPassword) {
     $localUserPwd = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($newUserPassword))
-    $summaryContent += "`n${newUsername}: $localUserPwd"
+    $summaryLines += "${newUsername}: $localUserPwd"
 }
 
-$summaryContent += "`n`n--- Installed Packages ---"
+$summaryLines += @(
+    ""
+    "--- Installed Packages ---"
+)
 foreach ($pkgName in $installedPackages) {
-    $summaryContent += "`n- $pkgName"
+    $summaryLines += "- $pkgName"
 }
 
-$summaryContent += "`n`n========================================"
+$summaryLines += @(
+    ""
+    "========================================"
+)
+
+$summaryContent = $summaryLines -join "`n"
 
 try {
     Set-Content -Path $ticketFile -Value $summaryContent
