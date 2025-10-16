@@ -202,7 +202,48 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 # ========================================
-# STEP 5: INSTALL SOFTWARE PACKAGES
+# STEP 5: ENABLE WINGET HASH OVERRIDE
+# ========================================
+
+Write-Host "Enabling Winget InstallerHashOverride..." -ForegroundColor Cyan
+
+try {
+    # Path to Winget settings file
+    $wingetSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json"
+
+    # Check if the settings file exists
+    if (Test-Path $wingetSettingsPath) {
+        # Read and decode the settings file
+        $settings = Get-Content $wingetSettingsPath | ConvertFrom-Json
+
+        # Enable the hash override setting
+        $settings.installerHashOverride = $true
+
+        # Encode the settings back to JSON and write to the file
+        $settings | ConvertTo-Json | Set-Content -Path $wingetSettingsPath
+        
+        Write-Host "✓ Winget InstallerHashOverride has been enabled" -ForegroundColor Green
+    } else {
+        # If the file doesn't exist, create it with the setting
+        $settings = @{
+            "installerHashOverride" = $true
+        }
+        $settings | ConvertTo-Json | Set-Content -Path $wingetSettingsPath
+        Write-Host "✓ Winget settings file created and InstallerHashOverride enabled" -ForegroundColor Green
+    }
+}
+catch {
+    Write-ErrorLog -Message "Error enabling Winget InstallerHashOverride: $_"
+}
+
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Software Installation" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+
+# ========================================
+# STEP 6: INSTALL SOFTWARE PACKAGES
 # ========================================
 
 # Define base packages to install with their Winget IDs
@@ -225,7 +266,7 @@ if ($isDomainDevice -eq "Y" -or $isDomainDevice -eq "y") {
 }
 
 
-$allowHashMismatch = $true
+
 
 # Install each package
 foreach ($pkg in $packages) {
@@ -243,16 +284,7 @@ foreach ($pkg in $packages) {
             $installedPackages += $pkg.Name
         } else {
             Write-Host "✗ $($pkg.Name) installation failed or was already installed" -ForegroundColor Yellow
-            if ($allowHashMismatch -and ($pkg.ID -eq "Google.Chrome" -or $pkg.ID -eq "Mozilla.Firefox" -or $pkg.ID -eq "Microsoft.Office")) {
-                Write-Host "Retrying $($pkg.Name) installation with --ignore-security-hash..." -ForegroundColor Yellow
-                winget install --id $($pkg.ID) --scope user --silent --ignore-security-hash --accept-package-agreements --accept-source-agreements
-                if ($LASTEXITCODE -eq 0) {
-                    Write-Host "✓ $($pkg.Name) installed successfully in user mode" -ForegroundColor Green
-                    $installedPackages += $pkg.Name
-                } else {
-                    Write-ErrorLog -Message "Failed to install $($pkg.Name) in user mode with --ignore-security-hash"
-                }
-            }
+            
         }
     }
     catch {
@@ -266,7 +298,7 @@ Write-Host "Software installation completed!" -ForegroundColor Green
 Write-Host ""
 
 # ========================================
-# STEP 6: WINDOWS UPDATES
+# STEP 7: WINDOWS UPDATES
 # ========================================
 
 Write-Host "========================================" -ForegroundColor Cyan
@@ -346,7 +378,7 @@ if ($installUpdates -eq "Y" -or $installUpdates -eq "y") {
 }
 
 # ========================================
-# STEP 7: HP IMAGE ASSISTANT
+# STEP 8: HP IMAGE ASSISTANT
 # ========================================
 
 Write-Host "========================================" -ForegroundColor Cyan
@@ -390,7 +422,7 @@ if ($runHPIA -eq "Y" -or $runHPIA -eq "y") {
 }
 
 # ========================================
-# STEP 8: JOIN DOMAIN (if applicable)
+# STEP 9: JOIN DOMAIN (if applicable)
 # ========================================
 
 if ($isDomainDevice -eq "Y" -or $isDomainDevice -eq "y") {
@@ -419,7 +451,7 @@ if ($isDomainDevice -eq "Y" -or $isDomainDevice -eq "y") {
 
 
 # ========================================
-# STEP 9: CREATE SUMMARY FILE AND RESTART
+# STEP 10: CREATE SUMMARY FILE AND RESTART
 # ========================================
 
 Write-Host ""
