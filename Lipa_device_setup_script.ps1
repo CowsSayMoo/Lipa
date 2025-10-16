@@ -225,6 +225,8 @@ if ($isDomainDevice -eq "Y" -or $isDomainDevice -eq "y") {
 }
 
 
+$allowHashMismatch = $true
+
 # Install each package
 foreach ($pkg in $packages) {
     Write-Host "Installing $($pkg.Name)..." -ForegroundColor Cyan
@@ -241,6 +243,16 @@ foreach ($pkg in $packages) {
             $installedPackages += $pkg.Name
         } else {
             Write-Host "✗ $($pkg.Name) installation failed or was already installed" -ForegroundColor Yellow
+            if ($allowHashMismatch -and ($pkg.ID -eq "Google.Chrome" -or $pkg.ID -eq "Mozilla.Firefox" -or $pkg.ID -eq "Microsoft.Office")) {
+                Write-Host "Retrying $($pkg.Name) installation with --ignore-security-hash..." -ForegroundColor Yellow
+                winget install --id $($pkg.ID) --scope user --silent --ignore-security-hash --accept-package-agreements --accept-source-agreements
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Host "✓ $($pkg.Name) installed successfully in user mode" -ForegroundColor Green
+                    $installedPackages += $pkg.Name
+                } else {
+                    Write-ErrorLog -Message "Failed to install $($pkg.Name) in user mode with --ignore-security-hash"
+                }
+            }
         }
     }
     catch {
@@ -318,7 +330,7 @@ if ($installUpdates -eq "Y" -or $installUpdates -eq "y") {
             }
             
             # Check if restart is required
-            if (Get-WURebootStatus -Silent) {
+            if ((Get-WUInstallerStatus).IsRebootRequired) {
                 Write-Host "⚠ A restart is required to complete the updates" -ForegroundColor Yellow
                 $requiresRestart = $true
             }
