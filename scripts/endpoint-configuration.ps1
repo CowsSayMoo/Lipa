@@ -59,18 +59,26 @@ function Get-ValidPassword {
     )
 
     while ($true) {
-        $choice = Read-Host "Do you want to set a custom password (1), use a suggested password (2), or skip (3)? (Enter 1, 2, or 3)"
+        $suggestedPassword = ""
+        if ($username -eq "clientadmin") {
+            $suggestedPassword = "lipa$(Get-Date -Format 'ddMMyy')"
+        }
+        else {
+            $suggestedPassword = "${username}1234"
+        }
+
+        Write-Host "Password options for {$username}:"
+        Write-Host "1. Set a custom password"
+        Write-Host "2. Use the suggested password: $suggestedPassword"
+        Write-Host "3. Skip"
+        $choice = Read-Host "Enter your choice (1, 2, or 3)"
+
         if ($choice -eq '3') {
             return $null
         }
 
         if ($choice -eq '2') {
-            if ($username -eq "clientadmin") {
-                return "lipa$(Get-Date -Format 'ddMMyy')"
-            }
-            else {
-                return "${username}1234"
-            }
+            return ConvertTo-SecureString -String $suggestedPassword -AsPlainText -Force
         }
 
         if ($choice -eq '1') {
@@ -123,7 +131,7 @@ function Set-ClientAdminPassword {
         Write-Host "✓ Password for $username has been changed successfully." -ForegroundColor Green
     }
     catch {
-        Write-Warning "✗ Failed to change password for $username: $_"
+        Write-Warning "✗ Failed to change password for ${username}: $_"
     }
 }
 
@@ -162,7 +170,7 @@ function Add-LocalAdminUser {
         Write-Host "✓ User $username created and added to the Administrators group." -ForegroundColor Green
     }
     catch {
-        Write-Warning "✗ Failed to create user $username: $_"
+        Write-Warning "✗ Failed to create user ${username}: $_"
     }
 }
 
@@ -218,7 +226,7 @@ Set-OutlookClassic
 # Function to move Splashtop file
 function Move-SplashtopFile {
     Write-Progress-Message "Moving Splashtop File" "Magenta"
-    $downloadsPath = [Environment]::GetFolderPath("Downloads")
+    $downloadsPath = "$env:USERPROFILE\Downloads"
     $destinationPath = "C:\Users\Public\Desktop\SOS Lipa.exe"
 
     try {
