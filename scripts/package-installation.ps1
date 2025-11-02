@@ -75,7 +75,7 @@ function Install-FromDownload {
         Invoke-WebRequest -Uri $DownloadUrl -OutFile $tempFile -ErrorAction Stop
     }
     catch {
-        throw "Failed to download $PackageName from $DownloadUrl: $_"
+        throw "Failed to download $PackageName from ${DownloadUrl} - $_"
     }
 
     Write-Host "Attempting to install $PackageName from $tempFile..."
