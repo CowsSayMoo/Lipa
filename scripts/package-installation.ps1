@@ -12,7 +12,7 @@
 $Packages = @(
     @{ Name = "Firefox"; WingetId = "Mozilla.Firefox"; ChocolateyId = "firefox" },
     @{ Name = "Google Chrome"; WingetId = "Google.Chrome"; ChocolateyId = "googlechrome" },
-    @{ Name = "Rustdesk"; WingetId = "Rustdesk.Rustdesk"; ChocolateyId = "rustdesk" },
+    @{ Name = "Rustdesk"; WingetId = "RustDesk.RustDesk"; ChocolateyId = "rustdesk" },
     @{ Name = "Adobe Acrobat Reader"; WingetId = "Adobe.Acrobat.Reader.64-bit"; ChocolateyId = "adobereader" },
     @{ Name = "Foxit PDF Reader"; WingetId = "Foxit.FoxitReader"; ChocolateyId = "foxitreader" },
     @{ Name = "Belgian EID middleware"; WingetId = "BelgianGovernment.eIDmiddleware"; ChocolateyId = "eid-belgium" },
@@ -126,8 +126,7 @@ function Install-WithWinget {
         return $true
     }
     else {
-        Write-Warning "✗ Winget install failed with exit code $exitCode"
-        return $false
+        throw "Winget install failed with exit code $exitCode"
     }
 }
 
@@ -151,36 +150,7 @@ function Install-WithChocolatey {
     }
 }
 
-function Install-FromDownload {
-    param (
-        [string]$PackageName,
-        [string]$DownloadUrl
-    )
 
-    Write-Host "→ Downloading $PackageName from URL..." -ForegroundColor Yellow
-    $tempFile = Join-Path -Path $env:TEMP -ChildPath "$($PackageName -replace '[^a-zA-Z0-9]', '_')-installer.exe"
-
-    try {
-        Invoke-WebRequest -Uri $DownloadUrl -OutFile $tempFile -ErrorAction Stop
-    }
-    catch {
-        Write-Warning "Failed to download $PackageName from ${DownloadUrl}: $_"
-        return $false
-    }
-
-    Write-Host "Executing installer..." -ForegroundColor Yellow
-    $process = Start-Process -FilePath $tempFile -Wait -PassThru
-
-    if ($process.ExitCode -eq 0) {
-        Write-Host "✓ Successfully installed $PackageName from download" -ForegroundColor Green
-        Remove-Item -Path $tempFile -Force -ErrorAction SilentlyContinue
-        return $true
-    }
-    else {
-        Write-Warning "Installation of $PackageName failed with exit code $($process.ExitCode)"
-        return $false
-    }
-}
 
 function Install-Chocolatey {
     if (Get-Command choco -ErrorAction SilentlyContinue) {
@@ -226,11 +196,13 @@ foreach ($package in $Packages) {
 
     # Try Winget first (only if WingetId exists and no ChocolateyId-only package)
     if ($package.WingetId) {
-        if (Install-WithWinget -PackageName $name -PackageId $package.WingetId) {
-            $installMethod = "winget"
-            $installed = $true
+        try {
+            if (Install-WithWinget -PackageName $name -PackageId $package.WingetId) {
+                $installMethod = "winget"
+                $installed = $true
+            }
         }
-        else {
+        catch {
             Write-Host "Winget installation failed, trying fallback methods..." -ForegroundColor Yellow
         }
     }
@@ -247,51 +219,13 @@ foreach ($package in $Packages) {
         }
     }
 
-    # Fallback to direct download (if Chocolatey failed or not available)
-    if (-not $installed -and $package.DownloadUrl) {
-        if (Install-FromDownload -PackageName $name -DownloadUrl $package.DownloadUrl) {
-            $installMethod = "download"
-            $installed = $true
-        }
-        else {
-            Write-Host "Download installation failed" -ForegroundColor Yellow
-        }
-    }
+
 
     # Open URL in browser (for packages that need manual download)
     if (-not $installed -and $package.OpenUrl) {
         Write-Host "→ Opening download page for $name in browser..." -ForegroundColor Cyan
-        $process = Start-Process $package.OpenUrl -PassThru
-        
-        # Wait for browser process to close
-        Write-Host "  Waiting for browser to close..." -ForegroundColor Gray
-        Wait-Process -Id $process.Id -ErrorAction SilentlyContinue
-        
-        # Find the most recent download (assuming default Downloads folder)
-        $downloadsPath = Join-Path $env:USERPROFILE "Downloads"
-        $latestFile = Get-ChildItem -Path $downloadsPath -Filter "*.exe" | 
-                      Sort-Object LastWriteTime -Descending | 
-                      Select-Object -First 1
-        
-        if ($latestFile) {
-            $destinationPath = "C:\Users\Public\Desktop\SOS Lipa.exe"
-            Write-Host "  Moving downloaded file to: $destinationPath" -ForegroundColor Gray
-            
-            try {
-                Move-Item -Path $latestFile.FullName -Destination $destinationPath -Force
-                Write-Host "✓ Successfully downloaded and placed $name as SOS Lipa on Public Desktop" -ForegroundColor Green
-                "Successfully downloaded and placed: $name as SOS Lipa" | Out-File -FilePath $SuccessLog -Append
-                $installed = $true
-            }
-            catch {
-                Write-Warning "Failed to move file: $_"
-                "Failed to move downloaded file for $name" | Out-File -FilePath $FailureLog -Append
-            }
-        }
-        else {
-            Write-Warning "No .exe file found in Downloads folder"
-            "No download found for $name after browser closed" | Out-File -FilePath $FailureLog -Append
-        }
+        Start-Process $package.OpenUrl
+        $installed = $true
     }
 
     # Log results
