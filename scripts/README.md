@@ -2,6 +2,7 @@
 
 This directory contains automation scripts for various tasks.
 
+## Package Installation Script
 
 The `package-installation.ps1` script automates the installation of a predefined list of software packages using a fallback mechanism (winget, Chocolatey, or direct download).
 
@@ -27,6 +28,4 @@ The `endpoint-configuration.ps1` script is designed to automate various endpoint
 ```powershell
 irm "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/endpoint-configuration.ps1" | iex
 ```
-
-## Package Installation Script
 
