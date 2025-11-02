@@ -1,0 +1,7 @@
+docker/windows/data.img
+docker/windows/windows.base
+docker/windows/windows.boot
+docker/windows/windows.mac
+docker/windows/windows.rom
+docker/windows/windows.vars
+docker/windows/windows.ver
