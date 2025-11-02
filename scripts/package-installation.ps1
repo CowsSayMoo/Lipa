@@ -75,7 +75,7 @@ function Install-FromDownload {
         Invoke-WebRequest -Uri $DownloadUrl -OutFile $tempFile -ErrorAction Stop
     }
     catch {
-        throw "Failed to download $PackageName from $DownloadUrl: $_"
+        throw "Failed to download $PackageName from $DownloadUrl: $($_.ToString())"
     }
 
     Write-Host "Attempting to install $PackageName from $tempFile..."
@@ -102,7 +102,7 @@ foreach ($package in $Packages) {
             $installed = true
         }
         catch {
-            Write-Warning "Winget installation for $name failed: $_"
+            Write-Warning "Winget installation for $name failed: $($_.ToString())"
         }
     }
 
@@ -114,7 +114,7 @@ foreach ($package in $Packages) {
             $installed = true
         }
         catch {
-            Write-Warning "Chocolatey installation for $name failed: $_"
+            Write-Warning "Chocolatey installation for $name failed: $($_.ToString())"
         }
     }
 
@@ -126,7 +126,7 @@ foreach ($package in $Packages) {
             $installed = true
         }
         catch {
-            Write-Warning "Download installation for $name failed: $_"
+            Write-Warning "Download installation for $name failed: $($_.ToString())"
         }
     }
 
