@@ -1,0 +1,242 @@
+<#
+.SYNOPSIS
+    Configures and maintains endpoints based on LIPA best practices.
+
+.DESCRIPTION
+    This script automates various endpoint configuration and system maintenance tasks.
+    It is designed to streamline the setup of new machines and ensure existing ones
+    adhere to LIPA's standards.
+#>
+
+# Function to write progress messages
+function Write-Progress-Message {
+    param (
+        [string]$Message,
+        [string]$Color = "Cyan"
+    )
+    Write-Host "`n$Message" -ForegroundColor $Color
+    Write-Host ("=" * 80) -ForegroundColor DarkGray
+}
+
+# Function to set the device name interactively
+function Set-DeviceName {
+    Write-Progress-Message "Configuring Device Name" "Magenta"
+
+    $currentName = (Get-ComputerInfo).CsName
+    Write-Host "Current device name: $currentName" -ForegroundColor Yellow
+
+    $newName = Read-Host "Enter the new device name (e.g., LIPA-PC-001)"
+    
+    if ([string]::IsNullOrWhiteSpace($newName)) {
+        Write-Warning "Device name cannot be empty. Skipping device rename."
+        return
+    }
+
+    if ($newName -eq $currentName) {
+        Write-Host "New device name is the same as the current name. No change needed." -ForegroundColor Green
+        return
+    }
+
+    try {
+        Rename-Computer -NewName $newName -Force -Confirm:$false
+        Write-Host "✓ Device name changed to $newName. A restart is required for the change to take effect." -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "✗ Failed to change device name: $_"
+    }
+}
+
+# Main configuration logic
+Write-Progress-Message "Starting Endpoint Configuration Process" "Cyan"
+
+# Call the function to set the device name
+Set-DeviceName
+
+# Function to get a valid password from the user
+function Get-ValidPassword {
+    param (
+        [string]$username
+    )
+
+    while ($true) {
+        $choice = Read-Host "Do you want to set a custom password (1), use a suggested password (2), or skip (3)? (Enter 1, 2, or 3)"
+        if ($choice -eq '3') {
+            return $null
+        }
+
+        if ($choice -eq '2') {
+            if ($username -eq "clientadmin") {
+                return "lipa$(Get-Date -Format 'ddMMyy')"
+            }
+            else {
+                return "${username}1234"
+            }
+        }
+
+        if ($choice -eq '1') {
+            while ($true) {
+                $password = Read-Host -AsSecureString "Enter the new password for $username"
+                $confirmPassword = Read-Host -AsSecureString "Confirm the new password"
+
+                if ($password -ne $confirmPassword) {
+                    Write-Warning "Passwords do not match. Please try again."
+                    continue
+                }
+
+                # Password complexity check (at least 8 characters, one uppercase, one lowercase, one number)
+                $passwordString = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($password))
+                if ($passwordString.Length -lt 8 -or $passwordString -notmatch "[a-z]" -or $passwordString -notmatch "[A-Z]" -or $passwordString -notmatch "\d") {
+                    Write-Warning "Password does not meet complexity requirements (at least 8 characters, one uppercase, one lowercase, one number). Please try again."
+                    continue
+                }
+
+                return $password
+            }
+        }
+
+        Write-Warning "Invalid choice. Please enter 1, 2, or 3."
+    }
+}
+
+# Function to set the clientadmin password
+function Set-ClientAdminPassword {
+    Write-Progress-Message "Configuring clientadmin Password" "Magenta"
+
+    $username = "clientadmin"
+    # Check if user exists
+    try {
+        $user = Get-LocalUser -Name $username -ErrorAction Stop
+    }
+    catch {
+        Write-Warning "User $username not found. Skipping password change."
+        return
+    }
+
+    $password = Get-ValidPassword -username $username
+    if ($password -eq $null) {
+        Write-Host "Skipping password change for $username." -ForegroundColor Yellow
+        return
+    }
+
+    try {
+        $user | Set-LocalUser -Password $password
+        Write-Host "✓ Password for $username has been changed successfully." -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "✗ Failed to change password for $username: $_"
+    }
+}
+
+# Function to add a new local admin user
+function Add-LocalAdminUser {
+    Write-Progress-Message "Adding New Local Admin User" "Magenta"
+
+    $choice = Read-Host "Do you want to add another local admin user? (y/n)"
+    if ($choice -ne 'y') {
+        return
+    }
+
+    $username = Read-Host "Enter the username for the new local admin"
+    if ([string]::IsNullOrWhiteSpace($username)) {
+        Write-Warning "Username cannot be empty. Skipping user creation."
+        return
+    }
+
+    try {
+        if (Get-LocalUser -Name $username -ErrorAction SilentlyContinue) {
+            Write-Warning "User $username already exists. Skipping user creation."
+            return
+        }
+    }
+    catch {}
+
+    $password = Get-ValidPassword -username $username
+    if ($password -eq $null) {
+        Write-Host "Skipping user creation for $username." -ForegroundColor Yellow
+        return
+    }
+
+    try {
+        $user = New-LocalUser -Name $username -Password $password -FullName $username -Description "Local administrator account"
+        Add-LocalGroupMember -Group "Administrators" -Member $username
+        Write-Host "✓ User $username created and added to the Administrators group." -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "✗ Failed to create user $username: $_"
+    }
+}
+
+# Call the function to set the clientadmin password
+Set-ClientAdminPassword
+
+# Call the function to add a new local admin user
+Add-LocalAdminUser
+
+# Function to disable Fast Startup
+function Disable-FastStartup {
+    Write-Progress-Message "Disabling Fast Startup" "Magenta"
+    try {
+        Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power" -Name "HiberbootEnabled" -Value 0 -Force
+        Write-Host "✓ Fast Startup has been disabled." -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "✗ Failed to disable Fast Startup: $_"
+    }
+}
+
+# Call the function to disable Fast Startup
+Disable-FastStartup
+
+# Function to set Outlook to classic mode
+function Set-OutlookClassic {
+    Write-Progress-Message "Forcing Outlook Classic Mode" "Magenta"
+    try {
+        # Hide the "Try the new Outlook" toggle
+        $regPath = "HKCU:\Software\Microsoft\Office\16.0\Outlook\Options\General"
+        if (-not (Test-Path $regPath)) {
+            New-Item -Path $regPath -Force | Out-Null
+        }
+        Set-ItemProperty -Path $regPath -Name "HideNewOutlookToggle" -Value 1 -Type DWord -Force
+
+        # Prevent automatic migration to the new Outlook
+        $regPath = "HKCU:\Software\Microsoft\Office\16.0\Outlook\Preferences"
+        if (-not (Test-Path $regPath)) {
+            New-Item -Path $regPath -Force | Out-Null
+        }
+        Set-ItemProperty -Path $regPath -Name "UseNewOutlook" -Value 0 -Type DWord -Force
+
+        Write-Host "✓ Outlook has been set to classic mode." -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "✗ Failed to set Outlook to classic mode: $_"
+    }
+}
+
+# Call the function to set Outlook to classic mode
+Set-OutlookClassic
+
+# Function to move Splashtop file
+function Move-SplashtopFile {
+    Write-Progress-Message "Moving Splashtop File" "Magenta"
+    $downloadsPath = [Environment]::GetFolderPath("Downloads")
+    $destinationPath = "C:\Users\Public\Desktop\SOS Lipa.exe"
+
+    try {
+        $splashtopFile = Get-ChildItem -Path $downloadsPath -Filter "*Splashtop*.exe" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+        if ($splashtopFile) {
+            Move-Item -Path $splashtopFile.FullName -Destination $destinationPath -Force
+            Write-Host "✓ Splashtop file moved to public desktop." -ForegroundColor Green
+        }
+        else {
+            Write-Warning "No Splashtop file found in the Downloads folder."
+        }
+    }
+    catch {
+        Write-Warning "✗ Failed to move Splashtop file: $_"
+    }
+}
+
+# Call the function to move the Splashtop file
+Move-SplashtopFile
+
+Write-Progress-Message "Endpoint Configuration Process Complete" "Green"

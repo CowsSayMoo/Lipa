@@ -2,6 +2,10 @@
 
 This directory contains automation scripts for various tasks.
 
+## Endpoint Configuration Script
+
+The `endpoint-configuration.ps1` script is designed to automate various endpoint configuration and system maintenance tasks, ensuring machines adhere to LIPA's standards.
+
 ## Package Installation Script
 
 The `package-installation.ps1` script automates the installation of a predefined list of software packages using a fallback mechanism (winget, Chocolatey, or direct download).
