@@ -2,11 +2,6 @@
 
 This directory contains automation scripts for various tasks.
 
-## Endpoint Configuration Script
-
-The `endpoint-configuration.ps1` script is designed to automate various endpoint configuration and system maintenance tasks, ensuring machines adhere to LIPA's standards.
-
-## Package Installation Script
 
 The `package-installation.ps1` script automates the installation of a predefined list of software packages using a fallback mechanism (winget, Chocolatey, or direct download).
 
@@ -24,3 +19,14 @@ The script logs the installation results to the following files:
 
 *   **Success Log:** `C:\temp\successful_installations.log`
 *   **Failure Log:** `C:\temp\failed_installations.log`
+
+## Endpoint Configuration Script
+
+The `endpoint-configuration.ps1` script is designed to automate various endpoint configuration and system maintenance tasks, ensuring machines adhere to LIPA's standards.
+
+```powershell
+irm "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/endpoint-configuration.ps1" | iex
+```
+
+## Package Installation Script
+
