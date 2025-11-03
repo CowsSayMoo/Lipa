@@ -279,22 +279,6 @@ function Move-SplashtopFile {
 # Call the function to move the Splashtop file
 Move-SplashtopFile
 
-# Function to run HP Support Assistant
-function Run-HPSupportAssistant {
-    Write-Progress-Message "Running HP Support Assistant" "Magenta"
-    $hpPath = "C:\Program Files (x86)\Hewlett-Packard\HP Support Framework\HPSF.exe"
-    if (Test-Path $hpPath) {
-        Start-Process $hpPath
-        Write-Host "✓ HP Support Assistant started." -ForegroundColor Green
-    }
-    else {
-        Write-Warning "HP Support Assistant not found at $hpPath"
-    }
-}
-
-# Call the function to run HP Support Assistant
-Run-HPSupportAssistant
-
 # Function to scan for Windows Updates
 function Scan-WindowsUpdates {
     Write-Progress-Message "Scanning for Windows Updates" "Magenta"
