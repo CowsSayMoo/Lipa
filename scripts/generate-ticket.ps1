@@ -31,9 +31,6 @@ $localUserPassword = $ticketInfo["USER_PASSWORD"]
 $serialNumber = (Get-CimInstance Win32_BIOS).SerialNumber
 $installedPackages = (Get-Package).Name
 $loggedInUser = "$env:USERDOMAIN\$env:USERNAME"
-$trendMicroInstalled = if ($installedPackages -like "*Trend Micro*") { "Ja" } else { "Nee" }
-$outlookConfigured = if (Test-Path "HKCU:\Software\Microsoft\Office\16.0\Outlook\Profiles") { "Ja" } else { "Nee" }
-$oneDriveConfigured = if (Test-Path "$env:USERPROFILE\OneDrive") { "Ja" } else { "Nee" }
 
 # Format the output
 $output = @"
@@ -48,15 +45,20 @@ $($installedPackages -join "`n")
 Locale gebruiker clientadmin -> $clientAdminPassword
 Locale gebruiker $localUser -> $localUserPassword
 
-Ingelogd op domein met gebruiker: $loggedInUser
-Aangemeld bij Outlook: $outlookConfigured
-Aangemeld bij OneDrive: $oneDriveConfigured
-Trend Micro geïnstalleerd: $trendMicroInstalled
+Ingelogd op domein met gebruiker: {vervang}
+Aangemeld bij Outlook: OK
+Aangemeld bij OneDrive: OK
+Trend Micro geïnstalleerd: OK
+
+internal
+
+Lokale gebruiker clientadmin -> $clientAdminPassword
+Lokale gebruiker $localUser -> $localUserPassword
 
 TODO:
 - [ ] Add lokale password to klantendossier
 - [ ] Remove old device from trendmicro
-- [ ] Tag sales in ticket if done
+- [ ] Tag sales in het ticket als je klaar bent
 - [ ] Add credentials to Keeper
 - [ ] Add Datto if user has service contract
 "@
