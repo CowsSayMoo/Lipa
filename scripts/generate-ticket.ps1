@@ -1,65 +1,65 @@
 <#
 .SYNOPSIS
-    Generates a support ticket summary for a device.
+    Generates a ticket with system information for a clean install.
 
 .DESCRIPTION
-    This script gathers device information, summarizes installed packages and applied configurations,
-    and includes a 'To-Do' section for manual tasks, all formatted for a support ticket.
+    This script gathers system information, including device details, installed packages,
+    and user credentials, and formats it into a ticket layout in Dutch.
 #>
 
-function Write-TicketSection {
-    param (
-        [string]$Title,
-        [string]$Content
-    )
-    Write-Host "`n--- $Title ---"
-    Write-Host $Content
-}
-
-# 1. Gather Device Information
-$ComputerInfo = Get-ComputerInfo
-$DeviceName = $ComputerInfo.CsName
-$ProductName = $ComputerInfo.OsOperatingSystemSKU
-$SerialNumber = (Get-CimInstance Win32_Bios).SerialNumber
-
-$DeviceInfo = @"
-Device Name: $DeviceName
-Product Name: $ProductName
-Serial Number: $SerialNumber
-"@
-Write-TicketSection "Device Information" $DeviceInfo
-
-# 2. Summarize Installed Packages
-$SuccessLogPath = "C:\temp\successful_installations.log"
-$InstalledPackages = "No packages installed or log file not found."
-if (Test-Path $SuccessLogPath) {
-    $InstalledPackages = Get-Content $SuccessLogPath | ForEach-Object { $_.Replace("Successfully installed ", "- ") }
-    if (-not $InstalledPackages) {
-        $InstalledPackages = "No packages successfully installed."
+# Function to read info from the temp file
+function Get-TicketInfoFromTempFile {
+    $tempFile = "C:\temp\device_info.txt"
+    if (Test-Path $tempFile) {
+        $info = @{}
+        Get-Content $tempFile | ForEach-Object {
+            $key, $value = $_.Split('=', 2)
+            $info[$key] = $value
+        }
+        return $info
     }
+    return $null
 }
-Write-TicketSection "Installed Packages" $InstalledPackages
 
-# 3. Summarize Endpoint Configuration (Inferred from endpoint-configuration.ps1)
-$EndpointConfigSummary = @"
-- Device name configured (if user provided input)
-- clientadmin password configured (if user provided input)
-- Local admin users added (if user provided input)
-- Fast Startup disabled
-- Outlook set to classic mode
-- Splashtop SOS file moved to public desktop (if found in downloads)
+# Get information
+$ticketInfo = Get-TicketInfoFromTempFile
+$deviceName = $ticketInfo["DEVICENAME"]
+$clientAdminPassword = $ticketInfo["CLIENTADMIN_PASSWORD"]
+$localUser = $ticketInfo["USER_USERNAME"]
+$localUserPassword = $ticketInfo["USER_PASSWORD"]
+
+$serialNumber = (Get-CimInstance Win32_BIOS).SerialNumber
+$installedPackages = (Get-Package).Name
+$loggedInUser = "$env:USERDOMAIN\$env:USERNAME"
+$trendMicroInstalled = if ($installedPackages -like "*Trend Micro*") { "Ja" } else { "Nee" }
+$outlookConfigured = if (Test-Path "HKCU:\Software\Microsoft\Office\16.0\Outlook\Profiles") { "Ja" } else { "Nee" }
+$oneDriveConfigured = if (Test-Path "$env:USERPROFILE\OneDrive") { "Ja" } else { "Nee" }
+
+# Format the output
+$output = @"
+Clean install
+
+Apparaatnaam: $deviceName
+Serienummer van het apparaat: $serialNumber
+
+Lijst van geïnstalleerde pakketten:
+$($installedPackages -join "`n")
+
+Locale gebruiker clientadmin -> $clientAdminPassword
+Locale gebruiker $localUser -> $localUserPassword
+
+Ingelogd op domein met gebruiker: $loggedInUser
+Aangemeld bij Outlook: $outlookConfigured
+Aangemeld bij OneDrive: $oneDriveConfigured
+Trend Micro geïnstalleerd: $trendMicroInstalled
+
+TODO:
+- [ ] Add lokale password to klantendossier
+- [ ] Remove old device from trendmicro
+- [ ] Tag sales in ticket if done
+- [ ] Add credentials to Keeper
+- [ ] Add Datto if user has service contract
 "@
-Write-TicketSection "Endpoint Configuration" $EndpointConfigSummary
 
-# 4. To-Do Section
-$ToDoSection = @"
-- [ ] Purchase and install antivirus license
-- [ ] Verify printer setup
-- [ ] Configure network shares
-- [ ] Install specialized software (e.g., CAD, accounting software)
-- [ ] Hardware upgrades (e.g., add RAM, increase storage)
-- [ ] ... (Add any other manual post-installation tasks here)
-"@
-Write-TicketSection "To-Do / Manual Tasks" $ToDoSection
-
-Write-Host "`nTicket generation complete. Please copy the above information into your ticketing system."
+# Write to console
+Write-Host $output

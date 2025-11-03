@@ -29,3 +29,11 @@ The `endpoint-configuration.ps1` script is designed to automate various endpoint
 irm "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/endpoint-configuration.ps1" | iex
 ```
 
+## `generate-ticket.ps1`
+
+This PowerShell script is designed to automate the creation of support tickets. It streamlines the process of logging new issues, ensuring consistency and reducing manual entry errors. Further details on its parameters and specific usage can be found within the script file itself.
+
+**Execution:**
+```powershell
+irm "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/generate-ticket.ps1" | iex
+```

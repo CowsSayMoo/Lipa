@@ -162,7 +162,7 @@ function Install-Chocolatey {
     try {
         Set-ExecutionPolicy Bypass -Scope Process -Force
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-        iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+        iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1')) | Out-Null
         
         # Refresh environment variables
         $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
@@ -177,6 +177,8 @@ function Install-Chocolatey {
 # Main installation logic
 Write-Progress-Message "Starting Package Installation Process" "Cyan"
 Write-Host "Total packages to process: $($Packages.Count)`n" -ForegroundColor White
+
+Install-Chocolatey
 
 $counter = 0
 foreach ($package in $Packages) {
@@ -209,7 +211,6 @@ foreach ($package in $Packages) {
 
     # Fallback to Chocolatey (if Winget failed or not available)
     if (-not $installed -and $package.ChocolateyId) {
-        Install-Chocolatey
         if (Install-WithChocolatey -PackageName $name -PackageId $package.ChocolateyId) {
             $installMethod = "chocolatey"
             $installed = $true

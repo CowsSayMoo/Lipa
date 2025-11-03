@@ -8,6 +8,28 @@
     adhere to LIPA's standards.
 #>
 
+# Temp file for ticket information
+$tempFile = "C:\temp\device_info.txt"
+if (Test-Path $tempFile) {
+    Clear-Content $tempFile
+}
+else {
+    $tempDir = Split-Path -Path $tempFile -Parent
+    if (-not (Test-Path -Path $tempDir)) {
+        New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+    }
+    New-Item -ItemType File -Path $tempFile -Force | Out-Null
+}
+
+# Function to write ticket information to a temp file
+function Write-TicketInfoToTempFile {
+    param (
+        [string]$Key,
+        [string]$Value
+    )
+    "$Key=$Value" | Out-File -FilePath "C:\temp\device_info.txt" -Append
+}
+
 # Function to write progress messages
 function Write-Progress-Message {
     param (
@@ -34,12 +56,14 @@ function Set-DeviceName {
 
     if ($newName -eq $currentName) {
         Write-Host "New device name is the same as the current name. No change needed." -ForegroundColor Green
+        Write-TicketInfoToTempFile -Key "DEVICENAME" -Value $currentName
         return
     }
 
     try {
         Rename-Computer -NewName $newName -Force -Confirm:$false
         Write-Host "✓ Device name changed to $newName. A restart is required for the change to take effect." -ForegroundColor Green
+        Write-TicketInfoToTempFile -Key "DEVICENAME" -Value $newName
     }
     catch {
         Write-Warning "✗ Failed to change device name: $_"
@@ -74,17 +98,22 @@ function Get-ValidPassword {
         $choice = Read-Host "Enter your choice (1, 2, or 3)"
 
         if ($choice -eq '3') {
-            return $null
+            return @{ Secure = $null; Plain = $null }
         }
 
         if ($choice -eq '2') {
-            return ConvertTo-SecureString -String $suggestedPassword -AsPlainText -Force
+            return @{ Secure = (ConvertTo-SecureString -String $suggestedPassword -AsPlainText -Force); Plain = $suggestedPassword }
         }
 
         if ($choice -eq '1') {
             while ($true) {
                 $password = Read-Host -AsSecureString "Enter the new password for $username"
                 $confirmPassword = Read-Host -AsSecureString "Confirm the new password"
+
+                if ($password.Length -eq 0) {
+                    Write-Warning "Password cannot be empty."
+                    continue
+                }
 
                 if ($password -ne $confirmPassword) {
                     Write-Warning "Passwords do not match. Please try again."
@@ -98,7 +127,7 @@ function Get-ValidPassword {
                     continue
                 }
 
-                return $password
+                return @{ Secure = $password; Plain = $passwordString }
             }
         }
 
@@ -120,14 +149,15 @@ function Set-ClientAdminPassword {
         return
     }
 
-    $password = Get-ValidPassword -username $username
-    if ($password -eq $null) {
+    $passwordInfo = Get-ValidPassword -username $username
+    if ($passwordInfo.Secure -eq $null) {
         Write-Host "Skipping password change for $username." -ForegroundColor Yellow
         return
     }
 
     try {
-        $user | Set-LocalUser -Password $password
+        $user | Set-LocalUser -Password $passwordInfo.Secure
+        Write-TicketInfoToTempFile -Key "CLIENTADMIN_PASSWORD" -Value $passwordInfo.Plain
         Write-Host "✓ Password for $username has been changed successfully." -ForegroundColor Green
     }
     catch {
@@ -158,15 +188,17 @@ function Add-LocalAdminUser {
     }
     catch {}
 
-    $password = Get-ValidPassword -username $username
-    if ($password -eq $null) {
+    $passwordInfo = Get-ValidPassword -username $username
+    if ($passwordInfo.Secure -eq $null) {
         Write-Host "Skipping user creation for $username." -ForegroundColor Yellow
         return
     }
 
     try {
-        $user = New-LocalUser -Name $username -Password $password -FullName $username -Description "Local administrator account"
+        $user = New-LocalUser -Name $username -Password $passwordInfo.Secure -FullName $username -Description "Local administrator account"
         Add-LocalGroupMember -Group "Administrators" -Member $username
+        Write-TicketInfoToTempFile -Key "USER_USERNAME" -Value $username
+        Write-TicketInfoToTempFile -Key "USER_PASSWORD" -Value $passwordInfo.Plain
         Write-Host "✓ User $username created and added to the Administrators group." -ForegroundColor Green
     }
     catch {
