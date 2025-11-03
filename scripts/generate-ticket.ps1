@@ -58,7 +58,7 @@ Serienummer van het apparaat: $serialNumber
 Lijst van geïnstalleerde pakketten:
 $installedPackages
 
-Lokaale gebruiker clientadmin beveiligd 
+Lokale gebruiker clientadmin beveiligd 
 Lokale gebruiker $localUser met installatie rechten
 
 Ingelogd op domein met gebruiker: {vervang}
