@@ -1,0 +1,14 @@
+[
+    { "Name": "Firefox", "WingetId": "Mozilla.Firefox", "ChocolateyId": "firefox" },
+    { "Name": "Google Chrome", "WingetId": "Google.Chrome", "ChocolateyId": "googlechrome" },
+    { "Name": "Rustdesk", "WingetId": "RustDesk.RustDesk", "ChocolateyId": "rustdesk" },
+    { "Name": "Adobe Acrobat Reader", "WingetId": "Adobe.Acrobat.Reader.64-bit", "ChocolateyId": "adobereader" },
+    { "Name": "Foxit PDF Reader", "WingetId": "Foxit.FoxitReader", "ChocolateyId": "foxitreader" },
+    { "Name": "Belgian EID middleware", "WingetId": "BelgianGovernment.eIDmiddleware", "ChocolateyId": "eid-belgium" },
+    { "Name": "Belgian EID viewer", "WingetId": "BelgianGovernment.eIDViewer", "ChocolateyId": "eid-belgium-viewer" },
+    { "Name": "OpenVPN Connect", "WingetId": "OpenVPNTechnologies.OpenVPNConnect", "ChocolateyId": "openvpn-connect" },
+    { "Name": "MS Office 365 Apps", "WingetId": "Microsoft.Office", "ChocolateyId": "office365business" },
+    { "Name": "HP Support Assistant", "ChocolateyId": "hpsupportassistant" },
+    { "Name": "HP Image Assistant", "ChocolateyId": "hpimageassistant" },
+    { "Name": "Splashtop", "OpenUrl": "https://my.splashtop.eu/sos/packages/download/XW2PS2PZ5KSKEU" }
+]

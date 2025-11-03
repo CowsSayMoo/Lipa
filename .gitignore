@@ -6,3 +6,4 @@ docker/windows/windows.rom
 docker/windows/windows.vars
 docker/windows/windows.ver
 scripts/package-installation.ps1
+docker/Win11_25H2_EnglishInternational_x64.iso
