@@ -14,7 +14,7 @@ $Packages = @(
     @{ Name = "Google Chrome"; WingetId = "Google.Chrome"; ChocolateyId = "googlechrome" },
     @{ Name = "Rustdesk"; WingetId = "RustDesk.RustDesk"; ChocolateyId = "rustdesk" },
     @{ Name = "Adobe Acrobat Reader"; WingetId = "Adobe.Acrobat.Reader.64-bit"; ChocolateyId = "adobereader" },
-    @{ Name = "Foxit PDF Reader"; WingetId = "Foxit.FoxitReader"; ChocolateyId = "foxitreader" },
+    @{ Name = "Foxit PDF Reader"; WingetId = "XPFCG5NRKXQPKT"; ChocolateyId = "foxitreader" },
     @{ Name = "Belgian EID middleware"; WingetId = "BelgianGovernment.eIDmiddleware"; ChocolateyId = "eid-belgium" },
     @{ Name = "Belgian EID viewer"; WingetId = "BelgianGovernment.eIDViewer"; ChocolateyId = "eid-belgium-viewer" },
     @{ Name = "OpenVPN Connect"; WingetId = "OpenVPNTechnologies.OpenVPNConnect"; ChocolateyId = "openvpn-connect" },
