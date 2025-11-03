@@ -21,3 +21,14 @@ This repository is organized into the following key areas:
 This knowledge base is a living project. All support engineers are encouraged to contribute their learnings and best practices. When you solve a new problem or find a better way to do something, document it here!
 
 Before adding new content, please check if a similar solution already exists. If it does, consider improving the existing document instead of creating a new one.
+
+## Script Usage
+
+### `generate-ticket.ps1`
+
+This PowerShell script is designed to automate the creation of support tickets. It streamlines the process of logging new issues, ensuring consistency and reducing manual entry errors. Further details on its parameters and specific usage can be found within the script file itself.
+
+**Execution:**
+```powershell
+irm "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/generate-ticket.ps1" | iex
+```
