@@ -13,12 +13,3 @@ This repository is organized into the following key areas:
 *   **Customer Configurations:** This section contains pre-configured setups and guides for various customer environments. The aim is to provide solutions that can be deployed with minimal effort.
 
 *   **Automation Scripts:** The `scripts` directory contains a collection of scripts to automate repetitive tasks. This includes endpoint configuration, system maintenance, and automated troubleshooting.
-
-    ### `generate-ticket.ps1`
-
-    This PowerShell script is designed to automate the creation of support tickets. It streamlines the process of logging new issues, ensuring consistency and reducing manual entry errors. Further details on its parameters and specific usage can be found within the script file itself.
-
-    **Execution:**
-    ```powershell
-    irm "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/generate-ticket.ps1" | iex
-    ```
