@@ -29,8 +29,24 @@ $localUser = $ticketInfo["USER_USERNAME"]
 $localUserPassword = $ticketInfo["USER_PASSWORD"]
 
 $serialNumber = (Get-CimInstance Win32_BIOS).SerialNumber
-$installedPackages = (Get-Package).Name
 $loggedInUser = "$env:USERDOMAIN\$env:USERNAME"
+
+$installedPackages = @"
+- Firefox
+- Google Chrome
+- Rustdesk
+- Adobe Acrobat Reader
+- Foxit PDF Reader
+- Belgian EID middleware
+- Belgian EID viewer
+- OpenVPN Connect
+- VLC Media player
+- HP programmable key
+- MS Office 365 Apps
+- HP Support Assistant
+- HP Image Assistant
+- Splashtop
+"@
 
 # Format the output
 $output = @"
@@ -40,10 +56,10 @@ Apparaatnaam: $deviceName
 Serienummer van het apparaat: $serialNumber
 
 Lijst van geïnstalleerde pakketten:
-$($installedPackages -join "`n")
+$installedPackages
 
-Locale gebruiker clientadmin -> $clientAdminPassword
-Locale gebruiker $localUser -> $localUserPassword
+Lokaale gebruiker clientadmin beveiligd 
+Lokale gebruiker $localUser met installatie rechten
 
 Ingelogd op domein met gebruiker: {vervang}
 Aangemeld bij Outlook: OK
@@ -56,12 +72,10 @@ Lokale gebruiker clientadmin -> $clientAdminPassword
 Lokale gebruiker $localUser -> $localUserPassword
 
 TODO:
-- [ ] Add lokale password to klantendossier
-- [ ] Remove old device from trendmicro
+- [ ] Voeg lokale passwoorden toe aan klantendossier
+- [ ] Voeg credentials toe aan Keeper
 - [ ] Tag sales in het ticket als je klaar bent
-- [ ] Add credentials to Keeper
-- [ ] Add Datto if user has service contract
+- [ ] Voeg Datto toe als de gebruiker een service contract heeft
 "@
 
-# Write to console
-Write-Host $output
+$output | Out-File -FilePath "$env:USERPROFILE\Desktop\autotask entry.txt"
