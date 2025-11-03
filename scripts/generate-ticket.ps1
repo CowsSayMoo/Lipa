@@ -1,4 +1,4 @@
-#<#
+<#
 .SYNOPSIS
     Generates a support ticket summary for a device.
 
