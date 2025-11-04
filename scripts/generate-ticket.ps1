@@ -54,22 +54,20 @@ Clean install
 
 Apparaatnaam: $deviceName
 Serienummer van het apparaat: $serialNumber
-
-Correte windows versie geinstalleerd 11
-Alle updates en drivers geinstalleerd  
+Correcte Windows versie geïnstalleerd: 11
+Alle updates en drivers geïnstalleerd  
 
 Hardware getest:
  - Camera
  - Microfoon
- - Wifi module
+ - Wifi-module
  - Voeding (Kabel) 
 
 Lijst van geïnstalleerde pakketten:
 $installedPackages
 
 Lokale gebruiker clientadmin beveiligd 
-Lokale gebruiker $localUser met installatie rechten
-
+Lokale gebruiker $localUser met installatierechten
 Ingelogd op domein met gebruiker: DOMEINGEBRUIKER
 
 Aangemeld bij MS365: FALSE
@@ -78,34 +76,30 @@ Aangemeld bij OneDrive: FALSE
 Trend Micro geïnstalleerd en geactiveerd: FALSE
 
 internal
-
 Lokale gebruiker clientadmin -> $clientAdminPassword
 Lokale gebruiker $localUser -> $localUserPassword
-
 TODO:
 - [ ] Voorzie labels op het toestel en doos
 - [ ] Noteer serienummers van producten
 
 - [ ] Test hardware -> Camera
-- [ ] Test hardware -> Microphoon
+- [ ] Test hardware -> Microfoon
 - [ ] Test hardware -> Card reader
 - [ ] Test hardware -> Wifi-module
 - [ ] Test hardware -> Voeding (Kabel)
-- [ ] Andere Hardware devices
+- [ ] Test hardware -> extra hardware devices (scherm, printer, etc..)
 
-- [ ] Update klantendossier -> Lokale gebruikers wachtwoorden 
-- [ ] Update klantendossier -> Trendmicro (Enkel bij nieuwe trendmicro klant)
-- [ ] Update klantendossier -> M365 (Enkel bij nieuwe M365 licentie)
-
-- [ ] Koppel Trendmicro ID bij autotask klant (Enkel bij eerste Trendmicro)
+- [ ] Update klantendossier -> Lokale gebruikerswachtwoorden 
+- [ ] Update klantendossier -> Trendmicro (Enkel bij nieuwe Trendmicro-klant)
+- [ ] Update klantendossier -> M365 (Enkel bij nieuwe M365-licentie)
 - [ ] Voeg credentials toe aan Keeper (Avepoint, M365, Trendmicro)
-- [ ] Voeg Datto toe (als de gebruiker een service contract heeft)
+- [ ] Koppel Trendmicro ID bij Autotask klant (Enkel bij eerste Trendmicro)
+
+- [ ] Voeg Datto toe (als de gebruiker een servicecontract heeft)
 
 - [ ] Tag sales in het ticket als je klaar bent (Bieke en Leen)
-- [ ] Kleef lipa sticker op toestel
-
-- [ ] Ga nog eens over het ticket en klantendosier en keeper
-
+- [ ] Kleef Lipa-sticker op toestel
+- [ ] Ga nog eens over het ticket en klantendossier en Keeper
                     _ _ _ _ _ _
                    |   MOO     |
 \|/          (__)  |_ _ _ _ _ _|
