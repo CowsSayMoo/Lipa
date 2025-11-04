@@ -84,23 +84,24 @@ Lokale gebruiker $localUser -> $localUserPassword
 
 TODO:
 - [ ] Voorzie labels op het toestel en doos
-- [ ] Noteer serienummer van producten
-
-- [ ] Update klantendossier -> Lokale wachtwoorden 
-- [ ] Update klantendossier -> Trendmicro (Enkel bij nieuwe trendmicro klant)
-- [ ] Update klantendossier -> M365 (Enkel bij nieuwe M365 licentie)
+- [ ] Noteer serienummers van producten
 
 - [ ] Test hardware -> Camera
 - [ ] Test hardware -> Microphoon
 - [ ] Test hardware -> Card reader
 - [ ] Test hardware -> Wifi-module
+- [ ] Test hardware -> Voeding (Kabel)
+- [ ] Andere Hardware devices
 
+- [ ] Update klantendossier -> Lokale gebruikers wachtwoorden 
+- [ ] Update klantendossier -> Trendmicro (Enkel bij nieuwe trendmicro klant)
+- [ ] Update klantendossier -> M365 (Enkel bij nieuwe M365 licentie)
+
+- [ ] Koppel Trendmicro ID bij autotask klant (Enkel bij eerste Trendmicro)
 - [ ] Voeg credentials toe aan Keeper (Avepoint, M365, Trendmicro)
-
 - [ ] Voeg Datto toe (als de gebruiker een service contract heeft)
 
 - [ ] Tag sales in het ticket als je klaar bent (Bieke en Leen)
-
 - [ ] Kleef lipa sticker op toestel
 
 - [ ] Ga nog eens over het ticket en klantendosier en keeper
