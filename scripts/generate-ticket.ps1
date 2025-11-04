@@ -55,16 +55,27 @@ Clean install
 Apparaatnaam: $deviceName
 Serienummer van het apparaat: $serialNumber
 
+Correte windows versie geinstalleerd 11
+Alle updates en drivers geinstalleerd  
+
+Hardware getest:
+ - Camera
+ - Microfoon
+ - Wifi module
+ - Voeding (Kabel) 
+
 Lijst van geïnstalleerde pakketten:
 $installedPackages
 
 Lokale gebruiker clientadmin beveiligd 
 Lokale gebruiker $localUser met installatie rechten
 
-Ingelogd op domein met gebruiker: {vervang}
-Aangemeld bij Outlook: OK
-Aangemeld bij OneDrive: OK
-Trend Micro geïnstalleerd: OK
+Ingelogd op domein met gebruiker: DOMEINGEBRUIKER
+
+Aangemeld bij MS365: FALSE
+Aangemeld bij Outlook: FALSE
+Aangemeld bij OneDrive: FALSE
+Trend Micro geïnstalleerd en geactiveerd: FALSE
 
 internal
 
@@ -72,10 +83,35 @@ Lokale gebruiker clientadmin -> $clientAdminPassword
 Lokale gebruiker $localUser -> $localUserPassword
 
 TODO:
-- [ ] Voeg lokale passwoorden toe aan klantendossier
-- [ ] Voeg credentials toe aan Keeper
-- [ ] Tag sales in het ticket als je klaar bent
-- [ ] Voeg Datto toe als de gebruiker een service contract heeft
+- [ ] Voorzie labels op het toestel en doos
+- [ ] Noteer serienummer van producten
+
+- [ ] Update klantendossier -> Lokale wachtwoorden 
+- [ ] Update klantendossier -> Trendmicro (Enkel bij nieuwe trendmicro klant)
+- [ ] Update klantendossier -> M365 (Enkel bij nieuwe M365 licentie)
+
+- [ ] Test hardware -> Camera
+- [ ] Test hardware -> Microphoon
+- [ ] Test hardware -> Card reader
+- [ ] Test hardware -> Wifi-module
+
+- [ ] Voeg credentials toe aan Keeper (Avepoint, M365, Trendmicro)
+
+- [ ] Voeg Datto toe (als de gebruiker een service contract heeft)
+
+- [ ] Tag sales in het ticket als je klaar bent (Bieke en Leen)
+
+- [ ] Kleef lipa sticker op toestel
+
+- [ ] Ga nog eens over het ticket en klantendosier en keeper
+
+                    _ _ _ _ _ _
+                   |   MOO     |
+\|/          (__)  |_ _ _ _ _ _|
+     `\------(oo) /
+       ||    (__)/
+       ||w--||     \|/
+   \|/
 "@
 
 $output | Out-File -FilePath "$env:USERPROFILE\Desktop\autotask entry.txt"
