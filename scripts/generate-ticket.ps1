@@ -110,5 +110,4 @@ TODO:
 "@
 
 $output | Out-File -FilePath "$env:USERPROFILE\Desktop\autotask entry.txt"
-$output | Out-File -FilePath "$env:USERPROFILE\Bureaublad\autotask entry.txt"
 
