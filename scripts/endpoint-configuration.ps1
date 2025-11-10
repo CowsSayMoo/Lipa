@@ -83,26 +83,13 @@ function Get-ValidPassword {
     )
 
     while ($true) {
-        $suggestedPassword = ""
-        if ($username -eq "clientadmin") {
-            $suggestedPassword = "lipa$(Get-Date -Format 'ddMMyy')"
-        }
-        else {
-            $suggestedPassword = "${username}1234"
-        }
-
-        Write-Host "Password options for {$username}:"
+        Write-Host "Password options for $username:"
         Write-Host "1. Set a custom password"
-        Write-Host "2. Use the suggested password: $suggestedPassword"
-        Write-Host "3. Skip"
-        $choice = Read-Host "Enter your choice (1, 2, or 3)"
-
-        if ($choice -eq '3') {
-            return @{ Secure = $null; Plain = $null }
-        }
+        Write-Host "2. Skip"
+        $choice = Read-Host "Enter your choice (1 or 2)"
 
         if ($choice -eq '2') {
-            return @{ Secure = (ConvertTo-SecureString -String $suggestedPassword -AsPlainText -Force); Plain = $suggestedPassword }
+            return @{ Secure = $null; Plain = $null }
         }
 
         if ($choice -eq '1') {
@@ -131,7 +118,7 @@ function Get-ValidPassword {
             }
         }
 
-        Write-Warning "Invalid choice. Please enter 1, 2, or 3."
+        Write-Warning "Invalid choice. Please enter 1 or 2."
     }
 }
 
@@ -163,7 +150,7 @@ function Set-ClientAdminPassword {
     catch {
         Write-Warning "✗ Failed to change password for ${username}: $_"
     }
-}
+}$null -eq $passwordInfo.Secure
 
 # Function to add a new local admin user
 function Add-LocalAdminUser {
