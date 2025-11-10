@@ -83,7 +83,7 @@ function Get-ValidPassword {
     )
 
     while ($true) {
-        Write-Host "Password options for $username:"
+        Write-Host "Password options for $username :"
         Write-Host "1. Set a custom password"
         Write-Host "2. Skip"
         $choice = Read-Host "Enter your choice (1 or 2)"
