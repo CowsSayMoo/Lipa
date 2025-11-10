@@ -83,7 +83,7 @@ function Get-ValidPassword {
     )
 
     while ($true) {
-        Write-Host "Password options for $username :"
+    Write-Host "Password options for ${username} :"
         Write-Host "1. Set a custom password"
         Write-Host "2. Skip"
         $choice = Read-Host "Enter your choice (1 or 2)"
@@ -94,8 +94,8 @@ function Get-ValidPassword {
 
         if ($choice -eq '1') {
             while ($true) {
-                $password = Read-Host -AsSecureString "Enter the new password for $username"
-                $confirmPassword = Read-Host -AsSecureString "Confirm the new password"
+                $password = Read-Host -AsSecureString "Enter the new password for ${username}"
+                $confirmPassword = Read-Host -AsSecureString "Confirm the new password for ${username}"
 
                 if ($password.Length -eq 0) {
                     Write-Warning "Password cannot be empty."
@@ -132,20 +132,20 @@ function Set-ClientAdminPassword {
         $user = Get-LocalUser -Name $username -ErrorAction Stop
     }
     catch {
-        Write-Warning "User $username not found. Skipping password change."
+    Write-Warning "User ${username} not found. Skipping password change."
         return
     }
 
     $passwordInfo = Get-ValidPassword -username $username
-    if ($passwordInfo.Secure -eq $null) {
-        Write-Host "Skipping password change for $username." -ForegroundColor Yellow
+    if ($null -eq $passwordInfo.Secure) {
+    Write-Host "Skipping password change for ${username}." -ForegroundColor Yellow
         return
     }
 
     try {
         $user | Set-LocalUser -Password $passwordInfo.Secure
         Write-TicketInfoToTempFile -Key "CLIENTADMIN_PASSWORD" -Value $passwordInfo.Plain
-        Write-Host "✓ Password for $username has been changed successfully." -ForegroundColor Green
+    Write-Host "✓ Password for ${username} has been changed successfully." -ForegroundColor Green
     }
     catch {
         Write-Warning "✗ Failed to change password for ${username}: $_"
@@ -176,17 +176,17 @@ function Add-LocalAdminUser {
     catch {}
 
     $passwordInfo = Get-ValidPassword -username $username
-    if ($passwordInfo.Secure -eq $null) {
-        Write-Host "Skipping user creation for $username." -ForegroundColor Yellow
+    if ($null -eq $passwordInfo.Secure) {
+        Write-Host "Skipping user creation for ${username}." -ForegroundColor Yellow
         return
     }
 
     try {
-        $user = New-LocalUser -Name $username -Password $passwordInfo.Secure -FullName $username -Description "Local administrator account"
+        New-LocalUser -Name $username -Password $passwordInfo.Secure -FullName $username -Description "Local administrator account"
         Add-LocalGroupMember -Group "Administrators" -Member $username
-        Write-TicketInfoToTempFile -Key "USER_USERNAME" -Value $username
-        Write-TicketInfoToTempFile -Key "USER_PASSWORD" -Value $passwordInfo.Plain
-        Write-Host "✓ User $username created and added to the Administrators group." -ForegroundColor Green
+    Write-TicketInfoToTempFile -Key "USER_USERNAME" -Value $username
+    Write-TicketInfoToTempFile -Key "USER_PASSWORD" -Value $passwordInfo.Plain
+    Write-Host "✓ User ${username} created and added to the Administrators group." -ForegroundColor Green
     }
     catch {
         Write-Warning "✗ Failed to create user ${username}: $_"
@@ -267,7 +267,7 @@ function Move-SplashtopFile {
 Move-SplashtopFile
 
 # Function to scan for Windows Updates
-function Scan-WindowsUpdates {
+function Invoke-WindowsUpdates {
     Write-Progress-Message "Scanning for Windows Updates" "Magenta"
     try {
         UsoClient.exe StartInteractiveScan
@@ -279,6 +279,6 @@ function Scan-WindowsUpdates {
 }
 
 # Call the function to scan for Windows Updates
-Scan-WindowsUpdates
+Invoke-WindowsUpdates
 
 Write-Progress-Message "Endpoint Configuration Process Complete" "Green"
