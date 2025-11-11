@@ -43,17 +43,17 @@ while ($true) {
     switch ($choice) {
         "1" {
             Write-Host "Running Package Installation Script..." -ForegroundColor Cyan
-            irm "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/package-installation.ps1" | iex
+            Invoke-Restmethod "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/package-installation.ps1" | Invoke-Expression
             Read-Host "Press Enter to continue..."
         }
         "2" {
             Write-Host "Running Endpoint Configuration Script..." -ForegroundColor Cyan
-            irm "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/endpoint-configuration.ps1" | iex
+            Invoke-Restmethod "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/endpoint-configuration.ps1" | Invoke-Expression
             Read-Host "Press Enter to continue..."
         }
         "3" {
             Write-Host "Running Autotask Ticket Entry Generation Script..." -ForegroundColor Cyan
-            irm "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/generate-ticket.ps1" | iex
+            Invoke-Restmethod "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/generate-ticket.ps1" | Invoke-Expression
             Read-Host "Press Enter to continue..."
         }
         "4" {

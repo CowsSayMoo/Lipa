@@ -29,7 +29,6 @@ $localUser = $ticketInfo["USER_USERNAME"]
 $localUserPassword = $ticketInfo["USER_PASSWORD"]
 
 $serialNumber = (Get-CimInstance Win32_BIOS).SerialNumber
-$loggedInUser = "$env:USERDOMAIN\$env:USERNAME"
 
 $installedPackages = @"
 - Firefox
