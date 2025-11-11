@@ -1,10 +1,3 @@
-# Check for Administrator privileges
-if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Write-Warning "This script needs to be run with Administrator privileges. Attempting to re-launch..."
-    Start-Process powershell.exe -Verb RunAs -ArgumentList "-NoProfile -File `"$($myInvocation.MyCommand.Path)`""
-    Exit
-}
-
 # main.ps1
 
 # Function to display ASCII art
