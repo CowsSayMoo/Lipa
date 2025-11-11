@@ -126,7 +126,7 @@ $checklistTabButton = New-TitleBarTab -Text "Checklist" -Left 315 -IsActive $fal
 # --- Window Control Buttons ---
 # Minimize Button
 $minimizeBtn = New-Object System.Windows.Forms.Button
-$minimizeBtn.Text = "─"
+$minimizeBtn.Text = "-"
 $minimizeBtn.Size = New-Object System.Drawing.Size(35, 30)
 $minimizeBtn.Location = New-Object System.Drawing.Point(410, 5)
 $minimizeBtn.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
@@ -141,7 +141,7 @@ $titleBar.Controls.Add($minimizeBtn)
 
 # Close Button
 $closeBtn = New-Object System.Windows.Forms.Button
-$closeBtn.Text = "✕"
+$closeBtn.Text = "x"
 $closeBtn.Size = New-Object System.Drawing.Size(35, 30)
 $closeBtn.Location = New-Object System.Drawing.Point(455, 5)
 $closeBtn.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
@@ -265,34 +265,104 @@ $checklistTitle.AutoSize = $true
 $checklistTitle.Location = New-Object System.Drawing.Point(30, 15)
 $checklistContent.Controls.Add($checklistTitle)
 
+# --- Device Type Selection (Radio Buttons) ---
+$deviceTypeGroupBox = New-Object System.Windows.Forms.GroupBox
+$deviceTypeGroupBox.Text = "Device Type"
+$deviceTypeGroupBox.Location = New-Object System.Drawing.Point(30, 50)
+$deviceTypeGroupBox.Size = New-Object System.Drawing.Size(430, 50)
+$deviceTypeGroupBox.Font = New-Object System.Drawing.Font($theme.FontFamily, $theme.ChecklistFontSize, [System.Drawing.FontStyle]::Bold)
+$deviceTypeGroupBox.ForeColor = $theme.DarkTextColor
+$checklistContent.Controls.Add($deviceTypeGroupBox)
+
+$radioLaptop = New-Object System.Windows.Forms.RadioButton
+$radioLaptop.Text = "Laptop"
+$radioLaptop.Location = New-Object System.Drawing.Point(10, 20)
+$radioLaptop.AutoSize = $true
+$radioLaptop.Checked = $true # Default selection
+$radioLaptop.Font = New-Object System.Drawing.Font($theme.FontFamily, $theme.ChecklistFontSize, [System.Drawing.FontStyle]::Regular)
+$deviceTypeGroupBox.Controls.Add($radioLaptop)
+
+$radioPC = New-Object System.Windows.Forms.RadioButton
+$radioPC.Text = "PC"
+$radioPC.Location = New-Object System.Drawing.Point(100, 20)
+$radioPC.AutoSize = $true
+$radioPC.Font = New-Object System.Drawing.Font($theme.FontFamily, $theme.ChecklistFontSize, [System.Drawing.FontStyle]::Regular)
+$deviceTypeGroupBox.Controls.Add($radioPC)
+
 # --- Checklist Items ---
-$checklistItems = @(
-    "Verify network connectivity",
-    "Check Windows updates status",
-    "Confirm antivirus is active and updated",
-    "Test domain connection",
-    "Verify user permissions",
-    "Check disk space availability",
-    "Confirm backup configuration",
-    "Test printer connectivity",
-    "Verify email configuration",
-    "Check system event logs",
-    "Confirm software installations",
-    "Test remote access capabilities"
+$laptopChecklistItems = @(
+    "Verify network connectivity (Laptop)",
+    "Check Windows updates status (Laptop)",
+    "Confirm antivirus is active and updated (Laptop)",
+    "Test domain connection (Laptop)",
+    "Verify user permissions (Laptop)",
+    "Check disk space availability (Laptop)",
+    "Confirm backup configuration (Laptop)",
+    "Test printer connectivity (Laptop)",
+    "Verify email configuration (Laptop)",
+    "Check system event logs (Laptop)",
+    "Confirm software installations (Laptop)",
+    "Test remote access capabilities (Laptop)"
 )
 
-$checkedListBox = New-Object System.Windows.Forms.CheckedListBox
-$checkedListBox.Location = New-Object System.Drawing.Point(30, 55)
-$checkedListBox.Size = New-Object System.Drawing.Size(430, 300)
-$checkedListBox.Font = New-Object System.Drawing.Font($theme.FontFamily, $theme.ChecklistFontSize, [System.Drawing.FontStyle]::Regular)
-$checkedListBox.CheckOnClick = $true
-$checkedListBox.BorderStyle = [System.Windows.Forms.BorderStyle]::FixedSingle
+$pcChecklistItems = @(
+    "Verify network connectivity (PC)",
+    "Check Windows updates status (PC)",
+    "Confirm antivirus is active and updated (PC)",
+    "Test domain connection (PC)",
+    "Verify user permissions (PC)",
+    "Check disk space availability (PC)",
+    "Confirm backup configuration (PC)",
+    "Test printer connectivity (PC)",
+    "Verify email configuration (PC)",
+    "Check system event logs (PC)",
+    "Confirm software installations (PC)",
+    "Test remote access capabilities (PC)",
+    "Check for dedicated GPU (PC)",
+    "Verify multiple monitor setup (PC)"
+)
 
-foreach ($item in $checklistItems) {
-    [void]$checkedListBox.Items.Add($item)
+# --- Laptop Checklist ---
+$laptopCheckedListBox = New-Object System.Windows.Forms.CheckedListBox
+$laptopCheckedListBox.Location = New-Object System.Drawing.Point(30, 110) # Adjusted position
+$laptopCheckedListBox.Size = New-Object System.Drawing.Size(430, 250) # Adjusted size
+$laptopCheckedListBox.Font = New-Object System.Drawing.Font($theme.FontFamily, $theme.ChecklistFontSize, [System.Drawing.FontStyle]::Regular)
+$laptopCheckedListBox.CheckOnClick = $true
+$laptopCheckedListBox.BorderStyle = [System.Windows.Forms.BorderStyle]::FixedSingle
+$laptopCheckedListBox.Visible = $true # Initially visible
+
+foreach ($item in $laptopChecklistItems) {
+    [void]$laptopCheckedListBox.Items.Add($item)
 }
+$checklistContent.Controls.Add($laptopCheckedListBox)
 
-$checklistContent.Controls.Add($checkedListBox)
+# --- PC Checklist ---
+$pcCheckedListBox = New-Object System.Windows.Forms.CheckedListBox
+$pcCheckedListBox.Location = New-Object System.Drawing.Point(30, 110) # Same position as laptop checklist
+$pcCheckedListBox.Size = New-Object System.Drawing.Size(430, 250) # Same size
+$pcCheckedListBox.Font = New-Object System.Drawing.Font($theme.FontFamily, $theme.ChecklistFontSize, [System.Drawing.FontStyle]::Regular)
+$pcCheckedListBox.CheckOnClick = $true
+$pcCheckedListBox.BorderStyle = [System.Windows.Forms.BorderStyle]::FixedSingle
+$pcCheckedListBox.Visible = $false # Initially hidden
+
+foreach ($item in $pcChecklistItems) {
+    [void]$pcCheckedListBox.Items.Add($item)
+}
+$checklistContent.Controls.Add($pcCheckedListBox)
+
+$radioLaptop.Add_CheckedChanged({
+    if ($radioLaptop.Checked) {
+        $laptopCheckedListBox.Visible = $true
+        $pcCheckedListBox.Visible = $false
+    }
+})
+
+$radioPC.Add_CheckedChanged({
+    if ($radioPC.Checked) {
+        $laptopCheckedListBox.Visible = $false
+        $pcCheckedListBox.Visible = $true
+    }
+})
 
 # --- Event Handlers ---
 $installButton.Add_Click({
@@ -309,7 +379,7 @@ $ticketButton.Add_Click({
 
 # --- Footer Label ---
 $footerLabel = New-Object System.Windows.Forms.Label
-$footerLabel.Text = "Made with ♥ by CowsSayMoo"
+$footerLabel.Text = "Made with (L) by CowsSayMoo"
 $footerLabel.Font = New-Object System.Drawing.Font($theme.FontFamily, 9, [System.Drawing.FontStyle]::Regular)
 $footerLabel.ForeColor = $theme.TitleColor
 $footerLabel.AutoSize = $true
