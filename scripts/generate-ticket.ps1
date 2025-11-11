@@ -100,13 +100,6 @@ TODO:
 - [ ] Tag sales in het ticket als je klaar bent (Bieke en Leen)
 - [ ] Kleef Lipa-sticker op toestel
 - [ ] Ga nog eens over het ticket en klantendossier en Keeper
-                    _ _ _ _ _ _
-                   |   MOO     |
-\|/          (__)  |_ _ _ _ _ _|
-     `\------(oo) /
-       ||    (__)/
-       ||w--||     \|/
-   \|/
 "@
 
 $output | Out-File -FilePath "$env:USERPROFILE\Desktop\autotask entry.txt"

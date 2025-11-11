@@ -37,3 +37,21 @@ This PowerShell script is designed to automate the creation of support tickets. 
 ```powershell
 irm "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/generate-ticket.ps1" | iex
 ```
+
+## Main Menu Script
+
+The `main.ps1` script provides an interactive menu to select and run other automation scripts in this directory. It displays a "LIPA" ASCII art banner and presents numerical options for the available scripts.
+
+### How to Execute
+
+To run the main menu script, open PowerShell and execute:
+
+```powershell
+.\main.ps1
+```
+
+Or, if executing directly from a web source:
+
+```powershell
+irm "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/main.ps1" | iex
+```

@@ -266,15 +266,27 @@ function Move-SplashtopFile {
 # Call the function to move the Splashtop file
 Move-SplashtopFile
 
-# Function to scan for Windows Updates
+# Function to install Windows Updates using PSWindowsUpdate module
 function Invoke-WindowsUpdates {
-    Write-Progress-Message "Scanning for Windows Updates" "Magenta"
+    Write-Progress-Message "Installing Windows Updates" "Magenta"
     try {
-        UsoClient.exe StartInteractiveScan
-        Write-Host "✓ Windows Update scan initiated." -ForegroundColor Green
+        # Check if PSWindowsUpdate module is installed
+        if (-not (Get-Module -ListAvailable -Name PSWindowsUpdate)) {
+            Write-Host "PSWindowsUpdate module not found. Installing..." -ForegroundColor Yellow
+            Install-Module -Name PSWindowsUpdate -Force -AcceptLicense -Confirm:$false
+            Write-Host "✓ PSWindowsUpdate module installed." -ForegroundColor Green
+        }
+
+        # Import the module
+        Import-Module PSWindowsUpdate -Force
+
+        # Install Windows Updates
+        Write-Host "Checking for and installing Windows Updates..." -ForegroundColor Yellow
+        Get-WindowsUpdate -Install -AcceptAll -AutoReboot -Verbose
+        Write-Host "✓ Windows Update installation process completed." -ForegroundColor Green
     }
     catch {
-        Write-Warning "✗ Failed to initiate Windows Update scan: $_"
+        Write-Warning "✗ Failed to install Windows Updates: $_"
     }
 }
 
