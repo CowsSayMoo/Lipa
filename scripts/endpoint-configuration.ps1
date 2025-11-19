@@ -150,7 +150,7 @@ function Set-ClientAdminPassword {
     catch {
         Write-Warning "✗ Failed to change password for ${username}: $_"
     }
-}$null -eq $passwordInfo.Secure
+}
 
 # Function to add a new local admin user
 function Add-LocalAdminUser {
