@@ -18,7 +18,7 @@ $Packages = @(
     @{ Name = "Belgian EID middleware"; WingetId = "BelgianGovernment.eIDmiddleware"; ChocolateyId = "eid-belgium" },
     @{ Name = "Belgian EID viewer"; WingetId = "BelgianGovernment.eIDViewer"; ChocolateyId = "eid-belgium-viewer" },
     @{ Name = "OpenVPN Connect"; WingetId = "OpenVPNTechnologies.OpenVPNConnect"; ChocolateyId = "openvpn-connect" },
-    @{ Name = "VLC Media player"; WingetId = "VideoLAN.VLC"; ChocolateyId = "vlc" },
+    @{ Name = "VLC Media player"; WingetId = ""; ChocolateyId = "vlc" },
     @{ Name = "HP programmable key"; WingetId = "9MW15F21R5G8"},
     @{ Name = "MS Office 365 Apps"; WingetId = "Microsoft.Office"; ChocolateyId = "office365business" },
     @{ Name = "HP Support Assistant"; ChocolateyId = "hpsupportassistant" },

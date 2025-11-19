@@ -90,8 +90,8 @@ TODO:
 
 - [ ] Update klantendossier -> Lokale gebruikerswachtwoorden 
 - [ ] Update klantendossier -> Trendmicro (Enkel bij nieuwe Trendmicro-klant)
-- [ ] Update klantendossier -> M365 (Enkel bij nieuwe M365-licentie)
-- [ ] Voeg credentials toe aan Keeper (Avepoint, M365, Trendmicro)
+- [ ] Update klantendossier -> M365 (Enkel bij nieuwe M365-licentie, admin account)
+- [ ] Voeg credentials toe aan Keeper (Avepoint, M365, enz..)
 - [ ] Koppel Trendmicro ID bij Autotask klant (Enkel bij eerste Trendmicro)
 
 - [ ] Voeg Datto toe (als de gebruiker een servicecontract heeft)
