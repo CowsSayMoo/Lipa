@@ -102,17 +102,18 @@ function Get-ValidPassword {
                     continue
                 }
 
-                if ($password -ne $confirmPassword) {
+                $pBSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($password)
+                $cpBSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($confirmPassword)
+
+                $pPlainText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($pBSTR)
+                $cpPlainText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($cpBSTR)
+
+                if ($pPlainText -ne $cpPlainText) {
                     Write-Warning "Passwords do not match. Please try again."
                     continue
                 }
 
-                # Password complexity check (at least 8 characters, one uppercase, one lowercase, one number)
                 $passwordString = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($password))
-                if ($passwordString.Length -lt 8 -or $passwordString -notmatch "[a-z]" -or $passwordString -notmatch "[A-Z]" -or $passwordString -notmatch "\d") {
-                    Write-Warning "Password does not meet complexity requirements (at least 8 characters, one uppercase, one lowercase, one number). Please try again."
-                    continue
-                }
 
                 return @{ Secure = $password; Plain = $passwordString }
             }
@@ -252,7 +253,14 @@ function Move-SplashtopFile {
         $splashtopFile = Get-ChildItem -Path $downloadsPath -Filter "*Splashtop*.exe" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
         if ($splashtopFile) {
             Move-Item -Path $splashtopFile.FullName -Destination $destinationPath -Force
-            Write-Host "✓ Splashtop file moved to public desktop." -ForegroundColor Green
+            
+            # Set permissions for all users to execute
+            $acl = Get-Acl $destinationPath
+            $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule("Users", "ReadAndExecute", "Allow")
+            $acl.SetAccessRule($accessRule)
+            Set-Acl -Path $destinationPath -AclObject $acl
+
+            Write-Host "✓ Splashtop file moved to public desktop and permissions set." -ForegroundColor Green
         }
         else {
             Write-Warning "No Splashtop file found in the Downloads folder."
