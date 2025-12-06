@@ -9,7 +9,9 @@ function Show-AsciiArt {
  \ \  \    \ \  \ \   ____\ \   __  \  
   \ \  \____\ \  \ \  \___|\ \  \ \  \ 
    \ \_______\ \__\ \__\    \ \__\ \__\
-    \|_______|\|__|\|__|     \|__|\|__|             
+    \|_______|\|__|\|__|     \|__|\|__| 
+                                       
+                                       
                                        
 "@ -ForegroundColor Green
 }
@@ -21,7 +23,7 @@ function Show-Menu {
     Write-Host "2. Endpoint Configuration Script"
     Write-Host "3. Autotask Ticket Entry Generation Script"
     Write-Host "4. Exit"
-    Write-Host "`nEnter your choice (1-4): " -NoNewline
+    Write-Host "Enter your choice (1-4): " -NoNewline
 }
 
 # Main loop

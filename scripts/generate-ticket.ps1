@@ -51,9 +51,9 @@ $installedPackages = @"
 $output = @"
 Clean install
 
+Correcte Windows versie geïnstalleerd: 11
 Apparaatnaam: $deviceName
 Serienummer van het apparaat: $serialNumber
-Correcte Windows versie geïnstalleerd: 11
 Alle updates en drivers geïnstalleerd  
 
 Hardware getest:
@@ -67,7 +67,6 @@ $installedPackages
 
 Lokale gebruiker clientadmin beveiligd 
 Lokale gebruiker $localUser met installatierechten
-Ingelogd op domein met gebruiker: DOMEINGEBRUIKER
 
 Aangemeld bij MS365: FALSE
 Aangemeld bij Outlook: FALSE

@@ -10,9 +10,10 @@
 
 # Packages to install
 $Packages = @(
+    @{ Name = "Splashtop"; OpenUrl = "https://my.splashtop.eu/sos/packages/download/XW2PS2PZ5KSKEU" }
+    @{ Name = "Rustdesk"; WingetId = "RustDesk.RustDesk"; ChocolateyId = "rustdesk" },
     @{ Name = "Firefox"; WingetId = "Mozilla.Firefox"; ChocolateyId = "firefox" },
     @{ Name = "Google Chrome"; WingetId = "Google.Chrome"; ChocolateyId = "googlechrome" },
-    @{ Name = "Rustdesk"; WingetId = "RustDesk.RustDesk"; ChocolateyId = "rustdesk" },
     @{ Name = "Adobe Acrobat Reader"; WingetId = "Adobe.Acrobat.Reader.64-bit"; ChocolateyId = "adobereader" },
     @{ Name = "Foxit PDF Reader"; WingetId = "XPFCG5NRKXQPKT"; ChocolateyId = "foxitreader" },
     @{ Name = "Belgian EID middleware"; WingetId = "BelgianGovernment.eIDmiddleware"; ChocolateyId = "eid-belgium" },
@@ -20,10 +21,9 @@ $Packages = @(
     @{ Name = "OpenVPN Connect"; WingetId = "OpenVPNTechnologies.OpenVPNConnect"; ChocolateyId = "openvpn-connect" },
     @{ Name = "VLC Media player"; WingetId = ""; ChocolateyId = "vlc" },
     @{ Name = "HP programmable key"; WingetId = "9MW15F21R5G8"},
-    @{ Name = "MS Office 365 Apps"; WingetId = "Microsoft.Office"; ChocolateyId = "office365business" },
     @{ Name = "HP Support Assistant"; ChocolateyId = "hpsupportassistant" },
-    @{ Name = "HP Image Assistant"; ChocolateyId = "hpimageassistant" },
-    @{ Name = "Splashtop"; OpenUrl = "https://my.splashtop.eu/sos/packages/download/XW2PS2PZ5KSKEU" }
+    @{ Name = "HP Image Assistant";  WingetId = " HP.ImageAssistant" ;ChocolateyId = "hpimageassistant" },
+    @{ Name = "MS Office 365 Apps"; WingetId = "Microsoft.Office"; ChocolateyId = "office365business" }
 )
 
 # Log files
@@ -151,7 +151,6 @@ function Install-WithChocolatey {
         return $false
     }
 }
-
 
 
 function Install-Chocolatey {
