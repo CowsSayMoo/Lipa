@@ -49,7 +49,17 @@ while ($true) {
             Invoke-Restmethod "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/generate-ticket.ps1" | Invoke-Expression
             Read-Host "Press Enter to continue..."
         }
-        "4" {
+         "4" {
+            Write-Host "Running Autotask Ticket Entry Generation Script..." -ForegroundColor Cyan
+            Invoke-Restmethod "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/rename-and-move-splashtop.ps1" | Invoke-Expression
+            Read-Host "Press Enter to continue..."
+        }
+         "5" {
+            Write-Host "Running Autotask Ticket Entry Generation Script..." -ForegroundColor Cyan
+            Invoke-Restmethod "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/windows-update.ps1" | Invoke-Expression
+            Read-Host "Press Enter to continue..."
+        }
+        "" {
             Write-Host "Exiting..." -ForegroundColor Red
             break
         }
