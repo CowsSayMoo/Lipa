@@ -22,8 +22,10 @@ function Show-Menu {
     Write-Host "1. Package Installation Script"
     Write-Host "2. Endpoint Configuration Script"
     Write-Host "3. Autotask Ticket Entry Generation Script"
-    Write-Host "4. Exit"
-    Write-Host "Enter your choice (1-4): " -NoNewline
+    Write-Host "4. Move and rename splashtop"
+    Write-Host "5. Update windows"
+    Write-Host "6. Exit"
+    Write-Host "Enter your choice (1-6): " -NoNewline
 }
 
 # Main loop
@@ -50,16 +52,16 @@ while ($true) {
             Read-Host "Press Enter to continue..."
         }
          "4" {
-            Write-Host "Running Autotask Ticket Entry Generation Script..." -ForegroundColor Cyan
+            Write-Host "Running move and rename splashtop..." -ForegroundColor Cyan
             Invoke-Restmethod "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/rename-and-move-splashtop.ps1" | Invoke-Expression
             Read-Host "Press Enter to continue..."
         }
          "5" {
-            Write-Host "Running Autotask Ticket Entry Generation Script..." -ForegroundColor Cyan
+            Write-Host "Running windows updates..." -ForegroundColor Cyan
             Invoke-Restmethod "https://raw.githubusercontent.com/CowsSayMoo/Lipa/refs/heads/main/scripts/windows-update.ps1" | Invoke-Expression
             Read-Host "Press Enter to continue..."
         }
-        "" {
+        "6" {
             Write-Host "Exiting..." -ForegroundColor Red
             break
         }
