@@ -12,7 +12,8 @@ $PackageList = @(
 )
 
 enum WingetExitCode {
-    Success = 0           
+    Success = 0  
+    NoUpgradesDetected = -1978335189         
     InstallerFailed = -1978335200
     HashMismatch = -1978335215   
 }
@@ -21,13 +22,15 @@ $indexList = [System.Collections.Generic.List[int]]::new()
 
 foreach ($package in $PackageList) {
     $index = $PackageList.IndexOf($package)
-    $installed = winget list --id $package.WingetId --exact | Out-String | Should -Not -Match "$($package.Name) - $($package.Version)"
     
-    if (-not $installed) {
         winget install --id $($package.WingetId) --accept-package-agreements --accept-source-agreements --source winget
+        $LASTEXITCODE
         switch ($LASTEXITCODE) {
             ([WingetExitCode]::Success) { 
                 write-host("$($package.Name) installed successfully.") 
+            }
+            ([WingetExitCode]::NoUpgradesDetected) { 
+                write-host("$($package.Name) is already installed or no upgrades detected.") 
             }
             ([WingetExitCode]::InstallerFailed) { 
                 write-host("$($package.Name) install failed."); $indexList.Add($index) 
@@ -39,7 +42,6 @@ foreach ($package in $PackageList) {
                 write-host("$($package.Name) install failed."); $indexList.Add($index) 
             }
         }
-    }
 }
 
 $indexList
