@@ -1,7 +1,7 @@
 $PackageList = @(
     @{ Name = "Rustdesk"; WingetId = "RustDesk.RustDesk"; chocoId = "rustdesk" },
     @{ Name = "Firefox"; WingetId = "Mozilla.Firefox"; chocoId = "firefox" },
-    @{ Name = "Google Chrome"; WingetId = "Google.Chrome"; chocoId = "googlechrome" },
+    # @{ Name = "Google Chrome"; WingetId = "Google.Chrome"; chocoId = "googlechrome" },
     @{ Name = "Adobe Acrobat Reader"; WingetId = "Adobe.Acrobat.Reader.64-bit"; chocoId = "adobereader" },
     @{ Name = "Foxit PDF Reader"; WingetId = "XPFCG5NRKXQPKT"; chocoId = "foxitreader" },
     @{ Name = "Belgian EID middleware"; WingetId = "BelgianGovernment.eIDmiddleware"; chocoId = "belgian-eid-middleware" },
@@ -24,22 +24,21 @@ foreach ($package in $PackageList) {
     $index = $PackageList.IndexOf($package)
     
         winget install --id $($package.WingetId) --accept-package-agreements --accept-source-agreements --source winget
-        $LASTEXITCODE
         switch ($LASTEXITCODE) {
-            ([WingetExitCode]::Success) { 
-                write-host("$($package.Name) installed successfully.") 
+            ([int][WingetExitCode]::Success) { 
+                write-host("$($package.Name) installed successfully."); break
             }
-            ([WingetExitCode]::NoUpgradesDetected) { 
-                write-host("$($package.Name) is already installed or no upgrades detected.") 
+            ([int][WingetExitCode]::NoUpgradesDetected) { 
+                write-host("$($package.Name) is already installed or no upgrades detected.") ; break
             }
-            ([WingetExitCode]::InstallerFailed) { 
-                write-host("$($package.Name) install failed."); $indexList.Add($index) 
+            ([int][WingetExitCode]::InstallerFailed) { 
+                write-host("$($package.Name) install failed."); $indexList.Add($index); break
             }
-            ([WingetExitCode]::HashMismatch) { 
-                write-host("$($package.Name) hash mismatch."); $indexList.Add($index) 
+            ([int][WingetExitCode]::HashMismatch) { 
+                write-host("$($package.Name) hash mismatch."); $indexList.Add($index); break
             }
             Default { 
-                write-host("$($package.Name) install failed."); $indexList.Add($index) 
+                write-host("$($package.Name) install failed."); $indexList.Add($index); break
             }
         }
 }
