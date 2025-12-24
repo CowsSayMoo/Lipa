@@ -1,9 +1,9 @@
 $PackageList = @(
     @{ Name = "Rustdesk"; WingetId = "RustDesk.RustDesk"; chocoId = "rustdesk" },
     @{ Name = "Firefox"; WingetId = "Mozilla.Firefox"; chocoId = "firefox" },
-    # @{ Name = "Google Chrome"; WingetId = "Google.Chrome"; chocoId = "googlechrome" },
+    @{ Name = "Google Chrome"; WingetId = "Google.Chrome"; chocoId = "googlechrome" },
     @{ Name = "Adobe Acrobat Reader"; WingetId = "Adobe.Acrobat.Reader.64-bit"; chocoId = "adobereader" },
-    @{ Name = "Foxit PDF Reader"; WingetId = "XPFCG5NRKXQPKT"; chocoId = "foxitreader" },
+    @{ Name = "Foxit PDF Reader"; WingetId = "Foxit.FoxitReader"; chocoId = "foxitreader" },
     @{ Name = "Belgian EID middleware"; WingetId = "BelgianGovernment.eIDmiddleware"; chocoId = "belgian-eid-middleware" },
     @{ Name = "Belgian EID viewer"; WingetId = "BelgianGovernment.eIDViewer"; chocoId = "belgian-eid-viewer" },
     @{ Name = "OpenVPN Connect"; WingetId = "OpenVPNTechnologies.OpenVPNConnect"; chocoId = "openvpn-connect" },
